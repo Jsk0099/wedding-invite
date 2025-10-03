@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Indian Wedding Invitation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      font-family: "Georgia", serif;
+      background: radial-gradient(circle at center, #fff8f0, #fbe3c6);
+      overflow-x: hidden;
+    }
+
+    /* Mandala background container */
+    #mandala-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .mandala {
+      position: absolute;
+      opacity: 0.2;
+      animation: rotateMandala 60s linear infinite;
+    }
+
+    @keyframes rotateMandala {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    /* Content sits above background */
+    .content {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 50px 20px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: maroon;
+    }
+    h2 {
+      font-size: 1.5rem;
+      color: goldenrod;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Mandala background holder -->
+<div id="mandala-bg"></div>
+
+<!-- Wedding Content -->
+<div class="content">
+  <h1>Sita & Ram</h1>
+  <h2>December 5, 2025 — Rajkot, Gujarat</h2>
+  <p>We warmly invite you to join our celebrations!</p>
+</div>
+
+<script>
+  // Function to generate a mandala SVG string
+  function createMandala(size, strokeColor="maroon") {
+    const paths = Array.from({ length: 24 })
+      .map((_, i) =>
+        `<path d="M300 20 L315 70 L300 120 L285 70 Z"
+          transform="rotate(${i * 15} 300 300) translate(0,180)" />`
+      )
+      .join('');
+    return `
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600"
+           width="${size}" height="${size}">
+        <g fill="none" stroke="${strokeColor}" stroke-width="2">
+          ${paths}
+        </g>
+      </svg>`;
+  }
+
+  const container = document.getElementById("mandala-bg");
+
+  // Create multiple mandalas at different corners/sizes
+  const mandalas = [
+    { x: "5%",  y: "5%",   size: 150, color: "goldenrod" },
+    { x: "90%", y: "10%",  size: 200, color: "maroon" },
+    { x: "10%", y: "90%",  size: 180, color: "darkred" },
+    { x: "85%", y: "85%",  size: 220, color: "gold" },
+    { x: "50%", y: "50%",  size: 400, color: "maroon" }
+  ];
+
+  mandalas.forEach((m, i) => {
+    const div = document.createElement("div");
+    div.className = "mandala";
+    div.style.left = m.x;
+    div.style.top = m.y;
+    div.style.transform = "translate(-50%, -50%)";
+    div.innerHTML = createMandala(m.size, m.color);
+    div.style.animationDuration = `${40 + i*10}s`; // different speeds
+    container.appendChild(div);
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Wedding Invitation</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      background: #f9f9f9;
+      color: #333;
+    }
+
+    /* Hero (Fixed Height) */
+    .hero {
+      position: relative;
+      height: 80vh;          /* Desktop */
+      min-height: 420px;
+      border-radius: 22px;
+      overflow: hidden;
+    }
+    @media (max-width: 768px) {
+      .hero { height: 65vh; min-height: 360px; }
+    }
+    @media (max-width: 480px) {
+      .hero { height: 60vh; min-height: 320px; }
+    }
+
+    .hero .swiper,
+    .hero .swiper-slide {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Slide background (gradient always visible) */
+    .hero .swiper-slide {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(202deg, rgba(63,94,251,1) 0%, rgba(252,70,107,1) 100%);
+    }
+
+    /* Images inside slide */
+    .hero .swiper-slide img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;   /* Prevent cropping */
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      cursor: zoom-in;
+      transition: transform 0.3s ease;
+    }
+
+    /* Overlay for text slide */
+    .hero .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,.45);
+      z-index: 2;
+    }
+
+    /* Text-only slide */
+    .hero-text-slide {
+      display: grid;
+      place-items: center;
+      background: linear-gradient(202deg, rgba(63,94,251,1) 0%, rgba(252,70,107,1) 100%);
+      position: relative;
+    }
+
+    .hero-text-content {
+      text-align: center;
+      z-index: 3;
+      animation: fadeSlideUp 1.2s ease-out forwards;
+      opacity: 0;
+    }
+    @keyframes fadeSlideUp {
+      0% { opacity: 0; transform: translateY(40px) scale(0.98); }
+      60% { opacity: 0.7; transform: translateY(15px) scale(1.02); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .hero-text-content h1 {
+      font-size: 3rem;
+      color: #fff;
+      margin: 0;
+    }
+    .hero-text-content p {
+      font-size: 1.3rem;
+      color: #eee;
+      margin: 15px 0 25px;
+    }
+    .hero-text-content .btn {
+      padding: 12px 28px;
+      font-size: 1rem;
+      background: linear-gradient(135deg, #ff7a7a, #ff3c3c);
+      border: none;
+      border-radius: 50px;
+      color: #fff;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+    .hero-text-content .btn:hover { transform: scale(1.05); }
+
+    /* Zoom Modal */
+    .zoom-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.9);
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+    .zoom-modal img {
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 12px;
+      cursor: zoom-out;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="swiper">
+      <div class="swiper-wrapper">
+        <!-- Slide 1 (Text) -->
+        <div class="swiper-slide hero-text-slide">
+          <div class="overlay"></div>
+          <div class="hero-text-content">
+            <h1>Sita ❤️ Ram</h1>
+            <p>December 5, 2025 • Rajkot, Gujarat</p>
+            <button class="btn">Save the Date</button>
+          </div>
+        </div>
+        <!-- Slide 2+ (Dynamic Images) -->
+        <div class="swiper-slide"><img src="./bg1.png" alt="Slide 1"></div>
+        <div class="swiper-slide"><img src="./bg2.png" alt="Slide 2"></div>
+        <div class="swiper-slide"><img src="https://picsum.photos/id/1016/1200/800" alt="Slide 3"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Zoom Modal -->
+  <div class="zoom-modal" id="zoomModal">
+    <img id="zoomImg" src="" alt="Zoomed Image">
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <script>
+    const swiper = new Swiper('.swiper', {
+      loop: true,
+      autoplay: { delay: 4000 },
+      effect: 'fade',
+      fadeEffect: { crossFade: true },
+    });
+
+    // Zoom modal logic
+    const zoomModal = document.getElementById("zoomModal");
+    const zoomImg = document.getElementById("zoomImg");
+    const slides = document.querySelectorAll(".swiper-slide img");
+
+    slides.forEach(img => {
+      img.addEventListener("click", () => {
+        zoomImg.src = img.src;
+        zoomModal.style.display = "flex";
+      });
+    });
+    zoomModal.addEventListener("click", () => {
+      zoomModal.style.display = "none";
+      zoomImg.src = "";
+    });
+  </script>
+</body>
+</html>

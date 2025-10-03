@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Wedding Invitation - Dhaval ❤️ Bansri</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Swiper.js -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.js"></script>
+  <!-- AOS -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <!-- Countdown -->
+  <script src="https://cdn.jsdelivr.net/npm/@chenfengyuan/countdown/dist/countdown.min.js"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Great Vibes', cursive; background: #fffaf5; scroll-behavior: smooth; }
+    .section-title { font-size: 2.5rem; margin-bottom: 1rem; color: #b45309; }
+    .custom-font { font-family: 'Great Vibes', cursive; }
+  </style>
+</head>
+<body>
+
+<!-- 🎶 Background Music -->
+<audio autoplay loop>
+  <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c4e586f7a9.mp3?filename=wedding-piano-11252.mp3" type="audio/mp3">
+</audio>
+
+<!-- 🎠 Carousel -->
+<section class="swiper mySwiper h-[80vh]">
+  <div class="swiper-wrapper">
+    <!-- Slide 1 -->
+    <div class="swiper-slide flex flex-col justify-center items-center bg-cover bg-center" style="background-image:url('https://via.placeholder.com/1200x700')">
+      <h1 class="text-5xl text-white drop-shadow-xl custom-font">Dhaval 💞 Bansri</h1>
+      <p class="text-2xl text-white mt-4">11th February 2023</p>
+    </div>
+    <!-- Slide 2 -->
+    <div class="swiper-slide flex justify-center items-center bg-white">
+      <img src="https://via.placeholder.com/800x600" class="rounded-xl shadow-xl" alt="Couple">
+    </div>
+    <!-- Slide 3 -->
+    <div class="swiper-slide flex justify-center items-center bg-white">
+      <img src="https://via.placeholder.com/800x600" class="rounded-xl shadow-xl" alt="Family">
+    </div>
+  </div>
+  <div class="swiper-pagination"></div>
+</section>
+
+<!-- ⏳ Countdown -->
+<section class="text-center py-10 bg-orange-50">
+  <h2 class="section-title">Countdown to Wedding</h2>
+  <div id="countdown" class="text-3xl text-gray-800"></div>
+</section>
+
+<!-- 💌 Invitation -->
+<section class="py-10 px-6 text-center bg-white" data-aos="fade-up">
+  <h2 class="section-title">You're Invited!</h2>
+  <p class="max-w-2xl mx-auto text-lg text-gray-700">We joyfully invite you to celebrate the union of Dhaval and Bansri as they begin their journey together.</p>
+</section>
+
+<!-- 📅 Wedding Schedule -->
+<section class="py-10 bg-orange-50" id="schedule" data-aos="fade-up">
+  <h2 class="section-title text-center">Wedding Schedule</h2>
+  <div class="max-w-4xl mx-auto grid md:grid-cols-2 gap-6 px-4">
+    <div class="p-6 bg-white rounded-xl shadow-md">
+      <h3 class="text-xl font-bold">🎶 Geet & Dandiya</h3>
+      <p>10 Feb 2023 @ 8:00 PM<br>📍 Rahi Farm</p>
+    </div>
+    <div class="p-6 bg-white rounded-xl shadow-md">
+      <h3 class="text-xl font-bold">🪔 Mandap Muhurat</h3>
+      <p>10 Feb 2023 @ 7:30 AM<br>📍 Rahi Farm</p>
+    </div>
+    <div class="p-6 bg-white rounded-xl shadow-md">
+      <h3 class="text-xl font-bold">🍽️ Bhojan Samarambh</h3>
+      <p>11 Feb 2023 @ 6:00 PM<br>📍 Rahi Farm</p>
+    </div>
+    <div class="p-6 bg-white rounded-xl shadow-md">
+      <h3 class="text-xl font-bold">✍️ Hasta Melap</h3>
+      <p>11 Feb 2023 @ 8:15 PM<br>📍 Rahi Farm</p>
+    </div>
+  </div>
+</section>
+
+<!-- 👰 Bride -->
+<section class="py-10 px-6 bg-white" data-aos="fade-right">
+  <h2 class="section-title text-center">Meet the Bride</h2>
+  <div class="max-w-3xl mx-auto text-center">
+    <img src="https://via.placeholder.com/200" class="mx-auto rounded-full shadow-lg" alt="Bride">
+    <h3 class="text-2xl mt-4">Bansri</h3>
+    <p>Daughter of Shree Bharatkumar Zulanbhai Vadhasiya<br>Granddaughter of Shree Mansukhbhai Zulanbhai Vadhasiya<br>From: Mulpadar, Surat</p>
+  </div>
+</section>
+
+<!-- 🤵 Groom -->
+<section class="py-10 px-6 bg-orange-50" data-aos="fade-left">
+  <h2 class="section-title text-center">Meet the Groom</h2>
+  <div class="max-w-3xl mx-auto text-center">
+    <img src="https://via.placeholder.com/200" class="mx-auto rounded-full shadow-lg" alt="Groom">
+    <h3 class="text-2xl mt-4">Dhaval</h3>
+    <p>Son of Shree Kanubhai Jivabhai Vadhasiya & Shree Ramaben<br>Native: Vankaner<br>Currently in: Kosmada, Surat</p>
+  </div>
+</section>
+
+<!-- 📍 Location -->
+<section class="py-10 bg-white" id="location" data-aos="zoom-in">
+  <h2 class="section-title text-center">Venue Location</h2>
+  <p class="text-center mb-6">Rahi Farm, Opp. Satyug Heights, Near Yogeshwar BRTS, Surat</p>
+  <div class="flex justify-center">
+    <iframe src="https://www.google.com/maps?q=Rahi+Farm+Yogeshwar+BRTS+Surat&output=embed" width="600" height="400" class="rounded-xl shadow-lg"></iframe>
+  </div>
+</section>
+
+<!-- 📝 RSVP -->
+<section class="py-10 bg-orange-50" data-aos="fade-up" id="rsvp">
+  <h2 class="section-title text-center">RSVP</h2>
+  <form class="max-w-xl mx-auto bg-white p-6 rounded-xl shadow-lg space-y-4">
+    <input type="text" placeholder="Your Name" class="w-full p-3 border rounded" required>
+    <input type="tel" placeholder="Contact Number (optional)" class="w-full p-3 border rounded">
+    <select class="w-full p-3 border rounded">
+      <option>Will you attend?</option>
+      <option>Yes</option>
+      <option>No</option>
+    </select>
+    <button type="submit" class="w-full bg-orange-600 text-white py-3 rounded-lg hover:bg-orange-700">Submit</button>
+  </form>
+</section>
+
+<!-- 💬 Footer -->
+<footer class="py-10 bg-white text-center">
+  <p class="text-xl custom-font text-gray-700">"With hearts full of love, we invite you to join our journey of togetherness."</p>
+  <p class="mt-4 text-gray-500">— Dhaval & Bansri</p>
+  <div class="mt-8 text-sm text-gray-400">Developed with 💻 by [Your Name]</div>
+</footer>
+
+<!-- JS Init -->
+<script>
+  AOS.init();
+  // Swiper
+  var swiper = new Swiper(".mySwiper", {
+    pagination: { el: ".swiper-pagination", clickable: true },
+    autoplay: { delay: 3000 },
+    loop: true
+  });
+  // Countdown
+  countdown('#countdown', '2023/02/11', function(ts) {
+    document.querySelector('#countdown').innerHTML = ts.days + " Days " + ts.hours + " Hrs " + ts.minutes + " Min " + ts.seconds + " Sec";
+  });
+</script>
+</body>
+</html>

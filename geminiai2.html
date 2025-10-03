@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wedding Invitation: Ananya & Rohan</title>
+    <!-- Chosen Palette: Indian Royal Wedding (Cream, Maroon, Gold) -->
+    <!-- Application Structure Plan: The website is structured as a narrative journey for the guest. It starts with a captivating 3D hero section and carousel to announce the couple and date. It then builds anticipation with a countdown timer. Next, it formally invites the guest and details the events in a clear timeline. It introduces the bride and groom's families, provides the venue location, and concludes with an optional RSVP and a final heartfelt message. This top-down, story-driven approach is intuitive and emotionally engaging, guiding the user seamlessly through all the necessary information. -->
+    <!-- Visualization & Content Choices: 
+        - Hero Carousel: Goal is to introduce the couple. A dynamic carousel is more engaging than static images. Interaction: Auto-play and manual navigation. Justification: Sets a personal and celebratory tone immediately. Method: Custom JS and CSS.
+        - 3D Background: Goal is to create a "wow" factor and magical ambiance. Interaction: Subtle mouse-move parallax effect. Justification: Fulfills the request for 3D and extraordinary visuals. Library: three.js.
+        - Countdown Timer: Goal is to build excitement. A live timer is more dynamic than a static date. Justification: Creates a sense of urgency and anticipation. Method: Custom JS.
+        - Event Timeline: Goal is to clearly present the schedule. A vertical timeline is an easily scannable and visually appealing way to show sequential events. Interaction: Scroll-based animations. Justification: Superior to a simple list for storytelling. Method: HTML/CSS with Tailwind.
+        - Google Map: Goal is to provide clear directions. An interactive map is the most user-friendly way to show a location. Justification: Practical and essential for guests. Method: Google Maps Embed.
+        - RSVP Form: Goal is to collect guest responses. A simple form is a direct call to action. Interaction: User input. Justification: Fulfills a key requirement, made toggleable for flexibility. Method: HTML/JS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tangerine:wght@700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #FFF8E1;
+            color: #4A2E2C;
+            font-family: 'Lato', sans-serif;
+            overflow-x: hidden;
+        }
+        .font-tangerine {
+            font-family: 'Tangerine', cursive;
+        }
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        .section-title {
+            font-family: 'Tangerine', cursive;
+            font-size: 5rem;
+            color: #800000;
+        }
+        .card {
+            background-color: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+        }
+        /* Carousel Styles */
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .carousel-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out, transform 1.5s ease-in-out;
+            transform: scale(1.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .carousel-slide.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .carousel-content {
+            text-align: center;
+            color: white;
+            padding: 2rem;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 1rem;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+        }
+        .carousel-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+        }
+        /* Scroll Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 1s, transform 1s;
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* Timeline Styles */
+        .timeline-item {
+            position: relative;
+            padding-bottom: 2rem;
+            padding-left: 2.5rem;
+        }
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 5px;
+            width: 2px;
+            height: 100%;
+            background-color: #FFD700;
+        }
+        .timeline-dot {
+            position: absolute;
+            left: -0.6rem;
+            top: 0;
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: 50%;
+            background-color: #800000;
+            border: 3px solid #FFF8E1;
+        }
+        /* Animated Flower */
+        .flower-petal {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: #FFD700;
+            border-radius: 50% 0;
+            transform-origin: bottom left;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <canvas id="bg-canvas"></canvas>
+
+    <header class="carousel-container" id="carousel">
+        <!-- Slides will be injected by JavaScript -->
+    </header>
+
+    <main class="relative z-10 bg-gradient-to-b from-transparent via-white/50 to-[#FFF8E1] pt-16">
+        <div class="container mx-auto px-6 py-12">
+            
+            <!-- Countdown Section -->
+            <section id="countdown" class="text-center py-16 reveal">
+                <h2 class="section-title mb-4">The Big Day</h2>
+                <p class="text-xl mb-8">We are waiting for the best day of our life</p>
+                <div id="countdown-timer" class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto text-center">
+                    <!-- Timer elements will be injected here -->
+                </div>
+            </section>
+            
+            <!-- Invitation Text -->
+            <section class="text-center py-16 reveal">
+                 <h2 class="section-title mb-8">You Are Invited</h2>
+                 <p class="max-w-3xl mx-auto text-xl leading-relaxed">
+                    With joyous hearts and the blessings of our parents, we invite you to be a part of our wedding celebration as we, Ananya and Rohan, tie the knot and embark on a new journey together. Your presence would make our special day even more memorable.
+                </p>
+            </section>
+
+            <!-- Wedding Schedule Section -->
+            <section class="py-16 reveal">
+                <h2 class="section-title text-center mb-12">Wedding Events</h2>
+                <div class="max-w-4xl mx-auto">
+                    <div class="relative">
+                        <!-- Timeline items will be injected here by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Bride & Groom Section -->
+            <section class="py-16 reveal">
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+                    <div class="text-center p-8 card rounded-lg reveal">
+                        <img src="https://placehold.co/400x400/800000/FFF8E1?text=Ananya" alt="The Bride" class="w-48 h-48 rounded-full mx-auto mb-6 border-4 border-[#FFD700] shadow-lg">
+                        <h3 class="font-tangerine text-6xl text-[#800000]">Ananya</h3>
+                        <p class="mt-4 text-lg">Daughter of Mr. Ashok & Mrs. Sunita Sharma. A kind soul with a heart full of dreams, Ananya lights up every room she enters with her infectious laughter and grace.</p>
+                    </div>
+                    <div class="text-center p-8 card rounded-lg reveal">
+                        <img src="https://placehold.co/400x400/4A2E2C/FFF8E1?text=Rohan" alt="The Groom" class="w-48 h-48 rounded-full mx-auto mb-6 border-4 border-[#FFD700] shadow-lg">
+                        <h3 class="font-tangerine text-6xl text-[#800000]">Rohan</h3>
+                        <p class="mt-4 text-lg">Son of Mr. Prakash & Mrs. Meena Verma. A charming gentleman with a passion for life, Rohan's unwavering support and loving nature are his greatest strengths.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Location Section -->
+            <section class="py-16 text-center reveal">
+                <h2 class="section-title mb-8">The Venue</h2>
+                <p class="text-xl mb-8">Join us as we say "I do" at this beautiful location.</p>
+                <div class="w-full h-96 rounded-lg overflow-hidden shadow-2xl border-4 border-[#FFD700]">
+                    <iframe 
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d235014.2922112891!2d72.4149257207409!3d23.02018174488317!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x395e848aba5bd449%3A0x4fcedd11614f6516!2sAhmedabad%2C%20Gujarat!5e0!3m2!1sen!2sin!4v1678886355816!5m2!1sen!2sin" 
+                        width="100%" 
+                        height="100%" 
+                        style="border:0;" 
+                        allowfullscreen="" 
+                        loading="lazy" 
+                        referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                </div>
+            </section>
+            
+            <!-- RSVP Section, conditionally rendered -->
+            <div id="rsvp-container"></div>
+            
+        </div>
+    </main>
+
+    <footer class="py-12 bg-[#4A2E2C] text-center text-[#FFF8E1]">
+        <div class="container mx-auto px-6">
+            <p class="font-tangerine text-5xl mb-4">Ananya & Rohan</p>
+            <p class="text-lg mb-8">Forever starts now. Thank you for being a part of our story.</p>
+            <div id="developer-info" class="text-sm opacity-70">
+                <p>Designed with ❤️</p>
+            </div>
+             <button id="music-toggle" class="mt-4 px-4 py-2 bg-yellow-500 text-black rounded">Mute Music</button>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // --- CONFIGURATION ---
+            const weddingDate = '2025-12-15T18:00:00';
+            const showRsvpForm = true;
+            
+            const carouselData = [
+                {
+                    type: 'title',
+                    image: 'https://placehold.co/1920x1080/333/FFF?text=A%26R',
+                    line1: 'Ananya',
+                    line2: '&',
+                    line3: 'Rohan',
+                    date: 'December 15, 2025'
+                },
+                {
+                    type: 'image',
+                    image: 'https://placehold.co/1920x1080/555/EEE?text=Our+Story',
+                    caption: 'Two souls, one heart.'
+                },
+                {
+                    type: 'image',
+                    image: 'https://placehold.co/1920x1080/777/CCC?text=With+Family',
+                    caption: 'Blessed by our loved ones.'
+                }
+            ];
+
+            const eventSchedule = [
+                { time: '4:00 PM', name: 'Baraat', description: 'The groom\'s procession arrives with music and dancing.' },
+                { time: '6:00 PM', name: 'Wedding Ceremony', description: 'The vows are taken, and the union is blessed.' },
+                { time: '8:00 PM', name: 'Reception & Dinner', description: 'A grand feast and celebration to honor the newly-weds.' }
+            ];
+
+            // --- 3D BACKGROUND ---
+            let scene, camera, renderer, particles;
+            function init3D() {
+                scene = new THREE.Scene();
+                camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                camera.position.z = 5;
+                
+                renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), alpha: true });
+                renderer.setSize(window.innerWidth, window.innerHeight);
+
+                const particleCount = 5000;
+                const positions = new Float32Array(particleCount * 3);
+                for (let i = 0; i < particleCount * 3; i++) {
+                    positions[i] = (Math.random() - 0.5) * 10;
+                }
+
+                const particlesGeometry = new THREE.BufferGeometry();
+                particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                const particlesMaterial = new THREE.PointsMaterial({
+                    color: 0xFFD700,
+                    size: 0.015,
+                    blending: THREE.AdditiveBlending,
+                    transparent: true,
+                    opacity: 0.7
+                });
+                particles = new THREE.Points(particlesGeometry, particlesMaterial);
+                scene.add(particles);
+
+                animate3D();
+            }
+
+            let mouseX = 0, mouseY = 0;
+            document.addEventListener('mousemove', (event) => {
+                mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+                mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+            });
+
+            function animate3D() {
+                requestAnimationFrame(animate3D);
+                particles.rotation.x += 0.0001;
+                particles.rotation.y += 0.0002;
+
+                camera.position.x += (mouseX * 0.1 - camera.position.x) * 0.02;
+                camera.position.y += (mouseY * 0.1 - camera.position.y) * 0.02;
+                camera.lookAt(scene.position);
+                
+                renderer.render(scene, camera);
+            }
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+            
+            init3D();
+
+            // --- BACKGROUND MUSIC ---
+            const synth = new Tone.PolySynth(Tone.Synth, {
+                oscillator: { type: "fatsawtooth" },
+                envelope: { attack: 0.1, decay: 0.2, sustain: 0.5, release: 0.8 },
+            }).toDestination();
+            let musicPlaying = false;
+            let musicSequence;
+
+            const musicToggleBtn = document.getElementById('music-toggle');
+            
+            function playMusic() {
+                Tone.start();
+                const notes = ["C4", "E4", "G4", "B4", "C5", "G4", "E4"];
+                let step = 0;
+                musicSequence = new Tone.Sequence((time, note) => {
+                    synth.triggerAttackRelease(note, "8n", time);
+                }, notes, "4n").start(0);
+                Tone.Transport.bpm.value = 80;
+                Tone.Transport.start();
+                musicPlaying = true;
+                musicToggleBtn.textContent = 'Mute Music';
+            }
+
+            function toggleMusic() {
+                if (!musicPlaying) {
+                    playMusic();
+                } else {
+                    Tone.Transport.stop();
+                    musicPlaying = false;
+                    musicToggleBtn.textContent = 'Play Music';
+                }
+            }
+            
+            document.body.addEventListener('click', () => {
+                if (!musicPlaying && Tone.context.state !== 'running') {
+                    playMusic();
+                }
+            }, { once: true });
+
+            musicToggleBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleMusic();
+            });
+
+            // --- CAROUSEL ---
+            const carouselContainer = document.getElementById('carousel');
+            let currentSlide = 0;
+
+            function renderCarousel() {
+                carouselContainer.innerHTML = carouselData.map((slide, index) => {
+                    let content = '';
+                    if(slide.type === 'title') {
+                        content = `<div class="carousel-content">
+                            <h1 class="font-tangerine text-8xl md:text-9xl">${slide.line1}</h1>
+                            <p class="font-tangerine text-6xl md:text-7xl my-4">${slide.line2}</p>
+                            <h1 class="font-tangerine text-8xl md:text-9xl">${slide.line3}</h1>
+                            <p class="text-2xl mt-8 tracking-widest">${slide.date}</p>
+                        </div>`;
+                    } else {
+                        content = `<div class="carousel-content"><p class="text-3xl">${slide.caption}</p></div>`;
+                    }
+                    return `<div class="carousel-slide ${index === 0 ? 'active' : ''}">
+                                <img src="${slide.image}" class="carousel-image" alt="Wedding Image">
+                                ${content}
+                            </div>`;
+                }).join('');
+            }
+            
+            function nextSlide() {
+                const slides = document.querySelectorAll('.carousel-slide');
+                slides[currentSlide].classList.remove('active');
+                currentSlide = (currentSlide + 1) % slides.length;
+                slides[currentSlide].classList.add('active');
+            }
+
+            renderCarousel();
+            setInterval(nextSlide, 7000);
+
+            // --- COUNTDOWN TIMER ---
+            const timerContainer = document.getElementById('countdown-timer');
+            function updateCountdown() {
+                const now = new Date().getTime();
+                const distance = new Date(weddingDate).getTime() - now;
+                
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                
+                timerContainer.innerHTML = `
+                    <div class="p-4 card rounded-lg"><div class="text-5xl font-bold">${days}</div><div class="text-lg">Days</div></div>
+                    <div class="p-4 card rounded-lg"><div class="text-5xl font-bold">${hours}</div><div class="text-lg">Hours</div></div>
+                    <div class="p-4 card rounded-lg"><div class="text-5xl font-bold">${minutes}</div><div class="text-lg">Minutes</div></div>
+                    <div class="p-4 card rounded-lg"><div class="text-5xl font-bold">${seconds}</div><div class="text-lg">Seconds</div></div>
+                `;
+                
+                if (distance < 0) {
+                    clearInterval(countdownInterval);
+                    timerContainer.innerHTML = `<div class="col-span-4 text-4xl p-4 card rounded-lg">The special day is here!</div>`;
+                }
+            }
+            
+            const countdownInterval = setInterval(updateCountdown, 1000);
+            updateCountdown();
+
+            // --- EVENT SCHEDULE ---
+            const timelineContainer = document.querySelector('.max-w-4xl .relative');
+            timelineContainer.innerHTML = eventSchedule.map(event => `
+                <div class="timeline-item reveal">
+                    <div class="timeline-dot"></div>
+                    <div class="p-6 card rounded-lg">
+                        <p class="font-bold text-xl text-[#800000] mb-1">${event.time}</p>
+                        <h3 class="text-2xl font-bold mb-2">${event.name}</h3>
+                        <p>${event.description}</p>
+                    </div>
+                </div>
+            `).join('');
+
+            // --- RSVP FORM ---
+            if (showRsvpForm) {
+                const rsvpContainer = document.getElementById('rsvp-container');
+                rsvpContainer.innerHTML = `
+                <section class="py-16 reveal">
+                    <h2 class="section-title text-center mb-8">RSVP</h2>
+                    <p class="text-center text-xl mb-8">Please let us know if you can make it by December 1st, 2025.</p>
+                    <form id="rsvp-form" class="max-w-xl mx-auto p-8 card rounded-lg">
+                        <div class="mb-4">
+                            <label for="name" class="block text-lg font-bold mb-2">Full Name</label>
+                            <input type="text" id="name" name="name" class="w-full p-3 rounded bg-white/50 border border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-500" required>
+                        </div>
+                        <div class="mb-6">
+                            <label for="guests" class="block text-lg font-bold mb-2">Number of Guests</label>
+                             <select id="guests" name="guests" class="w-full p-3 rounded bg-white/50 border border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                                <option>1</option>
+                                <option>2</option>
+                                <option>3</option>
+                                <option>4</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="w-full bg-[#800000] text-white py-3 rounded-lg text-lg font-bold hover:bg-opacity-90 transition-colors">I will be there!</button>
+                    </form>
+                    <div id="rsvp-response" class="text-center mt-4 text-xl font-bold text-green-700"></div>
+                </section>
+                `;
+
+                document.getElementById('rsvp-form').addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const responseEl = document.getElementById('rsvp-response');
+                    responseEl.textContent = 'Thank you for your response!';
+                    setTimeout(() => responseEl.textContent = '', 3000);
+                    e.target.reset();
+                });
+            }
+
+            // --- SCROLL ANIMATIONS ---
+            const revealElements = document.querySelectorAll('.reveal');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+            revealElements.forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+</html>

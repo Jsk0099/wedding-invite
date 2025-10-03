@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sita & Ram - Wedding Invitation</title>
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: #fffaf5;
+      overflow-x: hidden;
+    }
+    header {
+      text-align: center;
+      padding: 50px 20px;
+      background: linear-gradient(120deg, #ff9a9e, #fad0c4);
+      color: white;
+    }
+    header h1 {
+      font-size: 2.5rem;
+      font-weight: bold;
+    }
+    section {
+      padding: 60px 20px;
+      text-align: center;
+    }
+    .timeline {
+      max-width: 800px;
+      margin: auto;
+      text-align: left;
+    }
+    .timeline-item {
+      margin-bottom: 30px;
+    }
+    footer {
+      text-align: center;
+      padding: 30px;
+      background: #333;
+      color: white;
+    }
+    #music-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #ff6b6b;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+  </style>
+</head>
+<body>
+  <!-- 🎶 Background Music -->
+  <audio id="bg-music" loop>
+    <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c4e586f7a9.mp3?filename=wedding-piano-11252.mp3" type="audio/mp3">
+  </audio>
+  <button id="music-btn">🎵 Play Music</button>
+
+  <!-- Script for Lottie -->
+  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+
+  <header data-aos="fade-down">
+    <h1>Wedding Invitation</h1>
+    <p>Sita & Ram</p>
+    <p><strong>December 5, 2025</strong></p>
+  </header>
+
+  <!-- 🎉 Animated Couple -->
+  <section>
+    <lottie-player src="https://assets1.lottiefiles.com/packages/lf20_dyXy86.json" background="transparent"
+      speed="1" style="width:300px;height:300px;margin:auto;" loop autoplay>
+    </lottie-player>
+    <h2 data-aos="fade-up">We are getting married!</h2>
+  </section>
+
+  <!-- 📍 Venue -->
+  <section data-aos="zoom-in">
+    <h2>Venue</h2>
+    <p>Rajkot, Kings Party Plot, Gujarat, India</p>
+    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3709.948024404307!2d70.8022!3d22.3039" 
+            width="100%" height="250" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+    <br>
+    <!-- Wedding Rings Animation -->
+    <lottie-player src="https://assets6.lottiefiles.com/packages/lf20_touohxv0.json" background="transparent"
+      speed="1" style="width:200px;height:200px;margin:auto;" loop autoplay>
+    </lottie-player>
+  </section>
+
+  <!-- ❤️ Storyline -->
+  <section>
+    <h2 data-aos="fade-right">Our Story</h2>
+    <div class="timeline">
+      <div class="timeline-item" data-aos="fade-left">
+        <strong>First Meeting:</strong> In a garden near Sita’s home.
+      </div>
+      <div class="timeline-item" data-aos="fade-left">
+        <strong>First Date:</strong> Beautiful evening by the lake.
+      </div>
+      <div class="timeline-item" data-aos="fade-left">
+        <strong>Proposal:</strong> Under the stars.
+      </div>
+    </div>
+    <!-- Flowers animation -->
+    <lottie-player src="https://assets1.lottiefiles.com/packages/lf20_t24tpvcu.json" background="transparent"
+      speed="1" style="width:250px;height:250px;margin:auto;" loop autoplay>
+    </lottie-player>
+  </section>
+
+  <!-- 👨‍👩‍👧‍👦 Families -->
+  <section data-aos="fade-up">
+    <h2>Our Families</h2>
+    <p><strong>Bride's Family:</strong> Loving parents & relatives.</p>
+    <p><strong>Groom's Family:</strong> Caring parents & relatives.</p>
+    <!-- Hearts Animation -->
+    <lottie-player src="https://assets2.lottiefiles.com/packages/lf20_hbr24n0w.json" background="transparent"
+      speed="1" style="width:150px;height:150px;margin:auto;" loop autoplay>
+    </lottie-player>
+  </section>
+
+  <!-- 📅 Event Schedule -->
+  <section>
+    <h2 data-aos="fade-down">Event Schedule</h2>
+    <p><strong>Haldi:</strong> December 4, 2025 - 10:00 AM</p>
+    <p><strong>Wedding Ceremony:</strong> December 5, 2025 - 7:00 PM</p>
+    <p><strong>Reception:</strong> December 6, 2025 - 8:00 PM</p>
+  </section>
+
+  <footer>
+    <p>We can't wait to celebrate with you! ❤️</p>
+  </footer>
+
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script>
+    AOS.init();
+
+    // Music control
+    const music = document.getElementById("bg-music");
+    const btn = document.getElementById("music-btn");
+    let playing = false;
+    btn.addEventListener("click", () => {
+      if (!playing) {
+        music.play();
+        btn.innerText = "⏸ Pause Music";
+        playing = true;
+      } else {
+        music.pause();
+        btn.innerText = "🎵 Play Music";
+        playing = false;
+      }
+    });
+  </script>
+</body>
+</html>

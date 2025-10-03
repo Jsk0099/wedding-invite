@@ -1,0 +1,1409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wedding Invitation - Priya & Arjun</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://unpkg.com/@angular/core@17/bundles/core.umd.min.js"></script>
+    <script src="https://unpkg.com/@angular/common@17/bundles/common.umd.min.js"></script>
+    <script src="https://unpkg.com/@angular/platform-browser@17/bundles/platform-browser.umd.min.js"></script>
+    <script src="https://unpkg.com/@angular/platform-browser-dynamic@17/bundles/platform-browser-dynamic.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Dancing+Script:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-maroon: #8B0000;
+            --secondary-gold: #FFD700;
+            --cream: #F5F5DC;
+            --deep-gold: #B8860B;
+            --dark-maroon: #5C0000;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+            background: linear-gradient(135deg, var(--cream) 0%, #FAF0E6 100%);
+        }
+
+        .main-container {
+            position: relative;
+            perspective: 1000px;
+        }
+
+        .section {
+            min-height: 100vh;
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-maroon) 0%, var(--dark-maroon) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='20' fill='none' stroke='%23FFD700' stroke-width='0.5' opacity='0.3'/%3E%3Cpath d='M30,30 Q50,10 70,30 Q90,50 70,70 Q50,90 30,70 Q10,50 30,30' fill='none' stroke='%23FFD700' stroke-width='0.3' opacity='0.2'/%3E%3C/svg%3E");
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .carousel-container {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .carousel-slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: translateX(100%) rotateY(45deg);
+            transition: all 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .carousel-slide.active {
+            opacity: 1;
+            transform: translateX(0) rotateY(0deg);
+        }
+
+        .slide-content {
+            text-align: center;
+            max-width: 900px;
+            padding: 2rem;
+            transform: translateZ(50px);
+        }
+
+        .bride-groom-names {
+            font-family: 'Dancing Script', cursive;
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+            background: linear-gradient(45deg, var(--secondary-gold), #FFF8DC);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: glow 3s ease-in-out infinite alternate;
+        }
+
+        .wedding-date {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: var(--cream);
+            margin-bottom: 2rem;
+        }
+
+        .decorative-line {
+            width: 200px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--secondary-gold), transparent);
+            margin: 1rem auto;
+            position: relative;
+        }
+
+        .decorative-line::before,
+        .decorative-line::after {
+            content: '❋';
+            position: absolute;
+            color: var(--secondary-gold);
+            font-size: 1.5rem;
+            top: -12px;
+        }
+
+        .decorative-line::before {
+            left: -20px;
+        }
+
+        .decorative-line::after {
+            right: -20px;
+        }
+
+        /* Countdown Timer */
+        .countdown-section {
+            background: linear-gradient(135deg, var(--cream) 0%, #FFF8DC 100%);
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .countdown-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            color: var(--primary-maroon);
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .countdown-timer {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .countdown-item {
+            background: linear-gradient(135deg, white, var(--cream));
+            border-radius: 20px;
+            padding: 2rem 1.5rem;
+            box-shadow: 0 10px 30px rgba(139, 0, 0, 0.2);
+            transform: perspective(1000px) rotateX(5deg);
+            transition: transform 0.3s ease;
+            border: 2px solid var(--secondary-gold);
+        }
+
+        .countdown-item:hover {
+            transform: perspective(1000px) rotateX(0deg) translateY(-10px);
+        }
+
+        .countdown-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--primary-maroon);
+            display: block;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .countdown-label {
+            font-size: 1rem;
+            color: var(--deep-gold);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Schedule Section */
+        .schedule-section {
+            background: linear-gradient(135deg, var(--primary-maroon) 0%, var(--dark-maroon) 100%);
+            color: white;
+            padding: 4rem 2rem;
+        }
+
+        .schedule-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .schedule-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            color: var(--secondary-gold);
+        }
+
+        .festive-line {
+            text-align: center;
+            font-style: italic;
+            font-size: 1.2rem;
+            margin-bottom: 3rem;
+            color: var(--cream);
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(to bottom, var(--secondary-gold), var(--deep-gold));
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            transform: translateX(50px);
+            opacity: 0;
+            transition: all 0.6s ease;
+        }
+
+        .timeline-item.animate {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -2.5rem;
+            top: 1.5rem;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: var(--secondary-gold);
+            border: 3px solid var(--primary-maroon);
+        }
+
+        .event-time {
+            font-size: 1.1rem;
+            color: var(--secondary-gold);
+            font-weight: 600;
+        }
+
+        .event-title {
+            font-size: 1.5rem;
+            margin: 0.5rem 0;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .event-venue {
+            color: var(--cream);
+            font-size: 1rem;
+        }
+
+        /* Bride & Groom Sections */
+        .profile-section {
+            padding: 4rem 2rem;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+
+        .bride-section {
+            background: linear-gradient(135deg, #FFF0F5 0%, var(--cream) 100%);
+        }
+
+        .groom-section {
+            background: linear-gradient(135deg, var(--cream) 0%, #F0F8FF 100%);
+        }
+
+        .profile-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .profile-image {
+            position: relative;
+            transform-style: preserve-3d;
+        }
+
+        .character-3d {
+            width: 100%;
+            max-width: 400px;
+            height: 500px;
+            background: linear-gradient(145deg, var(--secondary-gold), var(--deep-gold));
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(139, 0, 0, 0.3);
+            transform: perspective(1000px) rotateY(10deg);
+            transition: transform 0.3s ease;
+        }
+
+        .character-3d:hover {
+            transform: perspective(1000px) rotateY(0deg) scale(1.05);
+        }
+
+        .character-3d::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 500'%3E%3Cdefs%3E%3ClinearGradient id='skin' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23F4C2A1'/%3E%3Cstop offset='100%25' style='stop-color:%23E6A87C'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cellipse cx='200' cy='150' rx='80' ry='90' fill='url(%23skin)'/%3E%3Cellipse cx='200' cy='300' rx='120' ry='180' fill='%238B0000'/%3E%3Ccircle cx='180' cy='130' r='3' fill='%23333'/%3E%3Ccircle cx='220' cy='130' r='3' fill='%23333'/%3E%3Cpath d='M185,155 Q200,165 215,155' stroke='%23333' stroke-width='2' fill='none'/%3E%3C/svg%3E") center/cover;
+        }
+
+        .profile-text {
+            padding: 2rem;
+        }
+
+        .profile-name {
+            font-family: 'Dancing Script', cursive;
+            font-size: 3rem;
+            color: var(--primary-maroon);
+            margin-bottom: 1rem;
+            transform: translateY(50px);
+            opacity: 0;
+            transition: all 0.8s ease;
+        }
+
+        .profile-details {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #555;
+            transform: translateY(50px);
+            opacity: 0;
+            transition: all 0.8s ease 0.2s;
+        }
+
+        .profile-section.animate .profile-name,
+        .profile-section.animate .profile-details {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Story Section */
+        .story-section {
+            background: linear-gradient(135deg, var(--dark-maroon) 0%, var(--primary-maroon) 100%);
+            color: white;
+            padding: 4rem 2rem;
+        }
+
+        .story-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .story-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: var(--secondary-gold);
+        }
+
+        .story-timeline {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .story-card {
+            flex: 1;
+            min-width: 250px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.8s ease;
+            cursor: pointer;
+        }
+
+        .story-card.animate {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .story-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(255, 215, 0, 0.2);
+        }
+
+        .story-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--secondary-gold);
+        }
+
+        .story-date {
+            font-size: 1.2rem;
+            color: var(--secondary-gold);
+            margin-bottom: 1rem;
+        }
+
+        .story-text {
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        /* Location Section */
+        .location-section {
+            background: linear-gradient(135deg, var(--cream) 0%, #FFF8DC 100%);
+            padding: 4rem 2rem;
+        }
+
+        .location-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .location-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            color: var(--primary-maroon);
+            margin-bottom: 2rem;
+        }
+
+        .map-container {
+            width: 100%;
+            height: 400px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(139, 0, 0, 0.2);
+            margin-top: 2rem;
+            position: relative;
+        }
+
+        .map-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #e8e8e8, #f0f0f0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 1.2rem;
+            position: relative;
+        }
+
+        .map-pin {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            background: var(--primary-maroon);
+            border-radius: 50% 50% 50% 0;
+            transform-origin: center;
+            animation: bounce 2s infinite;
+        }
+
+        .map-pin::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            background: var(--secondary-gold);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* RSVP Section */
+        .rsvp-section {
+            background: linear-gradient(135deg, var(--primary-maroon) 0%, var(--dark-maroon) 100%);
+            color: white;
+            padding: 4rem 2rem;
+        }
+
+        .rsvp-content {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .rsvp-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            color: var(--secondary-gold);
+        }
+
+        .rsvp-form {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--secondary-gold);
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--secondary-gold);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, var(--secondary-gold), var(--deep-gold));
+            color: var(--primary-maroon);
+            padding: 1rem 3rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            transform: translateY(0);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.4);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--dark-maroon);
+            color: white;
+            padding: 3rem 2rem 1rem;
+            text-align: center;
+        }
+
+        .footer-message {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2rem;
+            color: var(--secondary-gold);
+            margin-bottom: 2rem;
+        }
+
+        .footer-credits {
+            font-size: 0.9rem;
+            color: var(--cream);
+            opacity: 0.8;
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--secondary-gold);
+            color: var(--primary-maroon);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5rem;
+            opacity: 0;
+            transform: translateY(100px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .back-to-top.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-5px) scale(1.1);
+        }
+
+        /* Music Control */
+        .music-control {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: rgba(139, 0, 0, 0.9);
+            color: white;
+            border: 2px solid var(--secondary-gold);
+            border-radius: 50px;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .music-control:hover {
+            background: var(--primary-maroon);
+            transform: scale(1.05);
+        }
+
+        /* Animations */
+        @keyframes glow {
+            from { text-shadow: 3px 3px 6px rgba(0,0,0,0.3), 0 0 30px rgba(255, 215, 0, 0.5); }
+            to { text-shadow: 3px 3px 6px rgba(0,0,0,0.3), 0 0 50px rgba(255, 215, 0, 0.8); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translate(-50%, -50%) translateY(0); }
+            40% { transform: translate(-50%, -50%) translateY(-10px); }
+            60% { transform: translate(-50%, -50%) translateY(-5px); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .bride-groom-names {
+                font-size: 2.5rem;
+            }
+
+            .wedding-date {
+                font-size: 1.3rem;
+            }
+
+            .countdown-timer {
+                gap: 1rem;
+            }
+
+            .countdown-item {
+                padding: 1.5rem 1rem;
+            }
+
+            .countdown-number {
+                font-size: 2rem;
+            }
+
+            .profile-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+                text-align: center;
+            }
+
+            .story-timeline {
+                flex-direction: column;
+            }
+
+            .timeline {
+                padding-left: 1rem;
+            }
+
+            .timeline::before {
+                left: 10px;
+            }
+
+            .timeline-item::before {
+                left: -1.8rem;
+            }
+        }
+
+        /* Scroll Reveal */
+        .reveal {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 3D Card Effects */
+        .card-3d {
+            transform-style: preserve-3d;
+            transition: transform 0.3s ease;
+        }
+
+        .card-3d:hover {
+            transform: perspective(1000px) rotateX(5deg) rotateY(5deg);
+        }
+
+        /* Loading Animation */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-maroon);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 215, 0, 0.3);
+            border-top: 4px solid var(--secondary-gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <wedding-invitation></wedding-invitation>
+    </div>
+
+    <script>
+        // Wedding Data Configuration
+        const WEDDING_DATA = {
+            couple: {
+                bride: {
+                    name: "Priya",
+                    fullName: "Priya Sharma",
+                    father: "Mr. Rajesh Sharma",
+                    mother: "Mrs. Sunita Sharma",
+                    description: "A beautiful soul with a heart full of love and dreams. Priya brings joy and warmth to everyone around her.",
+                    profession: "Software Engineer",
+                    hobbies: "Dancing, Painting, Reading"
+                },
+                groom: {
+                    name: "Arjun",
+                    fullName: "Arjun Patel",
+                    father: "Mr. Vikram Patel",
+                    mother: "Mrs. Meera Patel",
+                    description: "A kind-hearted gentleman with unwavering dedication and love. Arjun's smile lights up every room he enters.",
+                    profession: "Data Scientist",
+                    hobbies: "Photography, Traveling, Cricket"
+                }
+            },
+            wedding: {
+                date: "2025-12-15",
+                venue: {
+                    name: "Grand Palace Hotel",
+                    address: "123 Heritage Road, Ahmedabad, Gujarat",
+                    coordinates: { lat: 23.0225, lng: 72.5714 }
+                }
+            },
+            schedule: [
+                {
+                    event: "Haldi Ceremony",
+                    date: "2025-12-13",
+                    time: "10:00 AM",
+                    venue: "Bride's Residence",
+                    description: "Traditional turmeric ceremony for blessings"
+                },
+                {
+                    event: "Mehendi Night",
+                    date: "2025-12-13",
+                    time: "6:00 PM",
+                    venue: "Grand Palace Hotel",
+                    description: "Beautiful henna designs and celebration"
+                },
+                {
+                    event: "Sangam Ceremony",
+                    date: "2025-12-14",
+                    time: "7:00 PM",
+                    venue: "Grand Palace Hotel",
+                    description: "Musical evening with family and friends"
+                },
+                {
+                    event: "Wedding Ceremony",
+                    date: "2025-12-15",
+                    time: "10:00 AM",
+                    venue: "Grand Palace Hotel",
+                    description: "Sacred wedding rituals and vows"
+                },
+                {
+                    event: "Reception",
+                    date: "2025-12-15",
+                    time: "7:00 PM",
+                    venue: "Grand Palace Hotel",
+                    description: "Grand celebration dinner and dance"
+                }
+            ],
+            story: [
+                {
+                    title: "First Meeting",
+                    date: "January 2022",
+                    description: "Destiny brought us together at a mutual friend's wedding",
+                    icon: "👥"
+                },
+                {
+                    title: "First Date",
+                    date: "March 2022",
+                    description: "Coffee turned into hours of endless conversation",
+                    icon: "☕"
+                },
+                {
+                    title: "The Proposal",
+                    date: "September 2024",
+                    description: "Under the stars, a question that changed everything",
+                    icon: "💍"
+                },
+                {
+                    title: "Engagement",
+                    date: "November 2024",
+                    description: "Celebrating our commitment with family and friends",
+                    icon: "🎉"
+                }
+            ],
+            messages: {
+                festiveLine: "Join us as we celebrate love, laughter, and forever",
+                footerMessage: "Two hearts, one soul, infinite love",
+                rsvpTitle: "Join Our Celebration"
+            },
+            settings: {
+                rsvpEnabled: true,
+                musicAutoplay: false,
+                backgroundMusic: "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav"
+            }
+        };
+
+        // Angular Application
+        const { Component, NgModule, Input, OnInit, OnDestroy } = ng.core;
+        const { CommonModule } = ng.common;
+        const { BrowserModule } = ng.platformBrowser;
+        const { platformBrowserDynamic } = ng.platformBrowserDynamic;
+
+        @Component({
+            selector: 'wedding-invitation',
+            template: `
+                <div class="main-container">
+                    <!-- Hero Section with Carousel -->
+                    <section class="section hero-section">
+                        <div class="hero-bg"></div>
+                        <div class="carousel-container">
+                            <div class="carousel-slide" 
+                                 *ngFor="let slide of carouselSlides; let i = index"
+                                 [class.active]="currentSlide === i">
+                                <div class="slide-content">
+                                    <ng-container [ngSwitch]="slide.type">
+                                        <div *ngSwitchCase="'names'">
+                                            <h1 class="bride-groom-names">
+                                                {{ weddingData.couple.bride.name }} & {{ weddingData.couple.groom.name }}
+                                            </h1>
+                                            <div class="decorative-line"></div>
+                                            <p class="wedding-date">{{ formatDate(weddingData.wedding.date) }}</p>
+                                        </div>
+                                        <div *ngSwitchCase="'couple'" class="couple-illustration">
+                                            <div class="character-3d">
+                                                <div style="position: absolute; bottom: 20px; left: 20px; color: white; font-size: 1.2rem;">
+                                                    {{ weddingData.couple.bride.name }} & {{ weddingData.couple.groom.name }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div *ngSwitchCase="'family'" class="family-illustration">
+                                            <h2 style="font-family: 'Dancing Script', cursive; font-size: 2.5rem; margin-bottom: 1rem;">
+                                                Two Families Becoming One
+                                            </h2>
+                                            <p style="font-size: 1.2rem; opacity: 0.9;">
+                                                {{ weddingData.couple.bride.father }} & {{ weddingData.couple.bride.mother }}<br>
+                                                invite you to celebrate with<br>
+                                                {{ weddingData.couple.groom.father }} & {{ weddingData.couple.groom.mother }}
+                                            </p>
+                                        </div>
+                                    </ng-container>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Countdown Section -->
+                    <section class="section countdown-section reveal">
+                        <h2 class="countdown-title">Countdown to Our Special Day</h2>
+                        <div class="countdown-timer">
+                            <div class="countdown-item card-3d">
+                                <span class="countdown-number">{{ countdown.days }}</span>
+                                <span class="countdown-label">Days</span>
+                            </div>
+                            <div class="countdown-item card-3d">
+                                <span class="countdown-number">{{ countdown.hours }}</span>
+                                <span class="countdown-label">Hours</span>
+                            </div>
+                            <div class="countdown-item card-3d">
+                                <span class="countdown-number">{{ countdown.minutes }}</span>
+                                <span class="countdown-label">Minutes</span>
+                            </div>
+                            <div class="countdown-item card-3d">
+                                <span class="countdown-number">{{ countdown.seconds }}</span>
+                                <span class="countdown-label">Seconds</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Schedule Section -->
+                    <section class="section schedule-section reveal">
+                        <div class="schedule-content">
+                            <h2 class="schedule-title">Wedding Schedule</h2>
+                            <p class="festive-line">{{ weddingData.messages.festiveLine }}</p>
+                            
+                            <div class="timeline">
+                                <div class="timeline-item" 
+                                     *ngFor="let event of weddingData.schedule; let i = index"
+                                     [style.transition-delay]="i * 0.2 + 's'">
+                                    <div class="event-time">{{ event.time }} | {{ formatDate(event.date) }}</div>
+                                    <h3 class="event-title">{{ event.event }}</h3>
+                                    <p class="event-venue">{{ event.venue }}</p>
+                                    <p style="margin-top: 0.5rem; font-style: italic;">{{ event.description }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Bride Section -->
+                    <section class="section profile-section bride-section reveal">
+                        <div class="profile-content">
+                            <div class="profile-image">
+                                <div class="character-3d">
+                                    <!-- Bride 3D Illustration -->
+                                </div>
+                            </div>
+                            <div class="profile-text">
+                                <h2 class="profile-name">{{ weddingData.couple.bride.fullName }}</h2>
+                                <div class="profile-details">
+                                    <p>{{ weddingData.couple.bride.description }}</p>
+                                    <br>
+                                    <p><strong>Profession:</strong> {{ weddingData.couple.bride.profession }}</p>
+                                    <p><strong>Hobbies:</strong> {{ weddingData.couple.bride.hobbies }}</p>
+                                    <br>
+                                    <p><strong>Parents:</strong><br>
+                                    {{ weddingData.couple.bride.father }}<br>
+                                    {{ weddingData.couple.bride.mother }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Groom Section -->
+                    <section class="section profile-section groom-section reveal">
+                        <div class="profile-content">
+                            <div class="profile-text">
+                                <h2 class="profile-name">{{ weddingData.couple.groom.fullName }}</h2>
+                                <div class="profile-details">
+                                    <p>{{ weddingData.couple.groom.description }}</p>
+                                    <br>
+                                    <p><strong>Profession:</strong> {{ weddingData.couple.groom.profession }}</p>
+                                    <p><strong>Hobbies:</strong> {{ weddingData.couple.groom.hobbies }}</p>
+                                    <br>
+                                    <p><strong>Parents:</strong><br>
+                                    {{ weddingData.couple.groom.father }}<br>
+                                    {{ weddingData.couple.groom.mother }}</p>
+                                </div>
+                            </div>
+                            <div class="profile-image">
+                                <div class="character-3d">
+                                    <!-- Groom 3D Illustration -->
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Love Story Section -->
+                    <section class="section story-section reveal">
+                        <div class="story-content">
+                            <h2 class="story-title">Our Love Story</h2>
+                            <div class="story-timeline">
+                                <div class="story-card card-3d" 
+                                     *ngFor="let story of weddingData.story; let i = index"
+                                     [style.transition-delay]="i * 0.3 + 's'">
+                                    <div class="story-icon">{{ story.icon }}</div>
+                                    <div class="story-date">{{ story.date }}</div>
+                                    <h3 style="margin-bottom: 1rem; font-family: 'Playfair Display', serif;">{{ story.title }}</h3>
+                                    <p class="story-text">{{ story.description }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Location Section -->
+                    <section class="section location-section reveal">
+                        <div class="location-content">
+                            <h2 class="location-title">Wedding Venue</h2>
+                            <h3 style="font-size: 1.5rem; color: var(--deep-gold); margin-bottom: 1rem;">
+                                {{ weddingData.wedding.venue.name }}
+                            </h3>
+                            <p style="font-size: 1.1rem; color: #666;">
+                                {{ weddingData.wedding.venue.address }}
+                            </p>
+                            
+                            <div class="map-container">
+                                <div class="map-placeholder">
+                                    <div>Google Maps Integration</div>
+                                    <div class="map-pin"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- RSVP Section -->
+                    <section class="section rsvp-section reveal" *ngIf="weddingData.settings.rsvpEnabled">
+                        <div class="rsvp-content">
+                            <h2 class="rsvp-title">{{ weddingData.messages.rsvpTitle }}</h2>
+                            
+                            <form class="rsvp-form" (ngSubmit)="onRSVPSubmit()" #rsvpForm="ngForm">
+                                <div class="form-group">
+                                    <label class="form-label">Full Name *</label>
+                                    <input type="text" class="form-input" [(ngModel)]="rsvpData.name" 
+                                           name="name" required placeholder="Enter your full name">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Phone Number *</label>
+                                    <input type="tel" class="form-input" [(ngModel)]="rsvpData.phone" 
+                                           name="phone" required placeholder="Enter your phone number">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-input" [(ngModel)]="rsvpData.email" 
+                                           name="email" placeholder="Enter your email (optional)">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Number of Guests</label>
+                                    <select class="form-input" [(ngModel)]="rsvpData.guests" name="guests">
+                                        <option value="1">1 Guest</option>
+                                        <option value="2">2 Guests</option>
+                                        <option value="3">3 Guests</option>
+                                        <option value="4">4 Guests</option>
+                                        <option value="5+">5+ Guests</option>
+                                    </select>
+                                </div>
+                                
+                                <button type="submit" class="submit-btn" [disabled]="!rsvpForm.valid">
+                                    {{ rsvpSubmitted ? 'Thank You!' : 'Confirm Attendance' }}
+                                </button>
+                            </form>
+                        </div>
+                    </section>
+
+                    <!-- Footer -->
+                    <footer class="footer">
+                        <div class="footer-message">{{ weddingData.messages.footerMessage }}</div>
+                        <div class="footer-credits">
+                            With love, {{ weddingData.couple.bride.name }} & {{ weddingData.couple.groom.name }}<br>
+                            <small style="margin-top: 1rem; display: block; opacity: 0.7;">
+                                Designed with ❤️ for our special day
+                            </small>
+                        </div>
+                    </footer>
+                </div>
+
+                <button class="back-to-top" [class.show]="showBackToTop" (click)="scrollToTop()">
+                    ↑
+                </button>
+
+                <audio #backgroundMusic [src]="weddingData.settings.backgroundMusic" 
+                       loop [muted]="!isMusicPlaying" preload="auto"></audio>
+            `,
+            styles: []
+        })
+        class WeddingInvitationComponent implements OnInit, OnDestroy {
+            weddingData = WEDDING_DATA;
+            currentSlide = 0;
+            carouselSlides = [
+                { type: 'names' },
+                { type: 'couple' },
+                { type: 'family' }
+            ];
+            
+            countdown = { days: 0, hours: 0, minutes: 0, seconds: 0 };
+            isLoading = true;
+            showBackToTop = false;
+            isMusicPlaying = false;
+            rsvpSubmitted = false;
+            
+            rsvpData = {
+                name: '',
+                phone: '',
+                email: '',
+                guests: '1'
+            };
+
+            private countdownInterval;
+            private carouselInterval;
+            private scrollListener;
+
+            ngOnInit() {
+                // Initialize loading
+                setTimeout(() => {
+                    this.isLoading = false;
+                    this.startCarousel();
+                    this.startCountdown();
+                    this.initScrollAnimations();
+                }, 2000);
+            }
+
+            ngOnDestroy() {
+                if (this.countdownInterval) clearInterval(this.countdownInterval);
+                if (this.carouselInterval) clearInterval(this.carouselInterval);
+                if (this.scrollListener) window.removeEventListener('scroll', this.scrollListener);
+            }
+
+            startCarousel() {
+                this.carouselInterval = setInterval(() => {
+                    this.currentSlide = (this.currentSlide + 1) % this.carouselSlides.length;
+                }, 5000);
+            }
+
+            startCountdown() {
+                const weddingDate = new Date(this.weddingData.wedding.date + 'T10:00:00').getTime();
+                
+                this.countdownInterval = setInterval(() => {
+                    const now = new Date().getTime();
+                    const distance = weddingDate - now;
+                    
+                    if (distance > 0) {
+                        this.countdown = {
+                            days: Math.floor(distance / (1000 * 60 * 60 * 24)),
+                            hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+                            minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
+                            seconds: Math.floor((distance % (1000 * 60)) / 1000)
+                        };
+                    } else {
+                        this.countdown = { days: 0, hours: 0, minutes: 0, seconds: 0 };
+                    }
+                }, 1000);
+            }
+
+            initScrollAnimations() {
+                this.scrollListener = () => {
+                    const scrollY = window.scrollY;
+                    this.showBackToTop = scrollY > 500;
+
+                    // Animate sections on scroll
+                    const sections = document.querySelectorAll('.reveal');
+                    sections.forEach(section => {
+                        const rect = section.getBoundingClientRect();
+                        if (rect.top < window.innerHeight * 0.8) {
+                            section.classList.add('active');
+                            
+                            // Animate timeline items
+                            if (section.classList.contains('schedule-section')) {
+                                const timelineItems = section.querySelectorAll('.timeline-item');
+                                timelineItems.forEach((item, index) => {
+                                    setTimeout(() => {
+                                        item.classList.add('animate');
+                                    }, index * 200);
+                                });
+                            }
+                            
+                            // Animate story cards
+                            if (section.classList.contains('story-section')) {
+                                const storyCards = section.querySelectorAll('.story-card');
+                                storyCards.forEach((card, index) => {
+                                    setTimeout(() => {
+                                        card.classList.add('animate');
+                                    }, index * 300);
+                                });
+                            }
+                            
+                            // Animate profile sections
+                            if (section.classList.contains('profile-section')) {
+                                section.classList.add('animate');
+                            }
+                        }
+                    });
+                };
+                
+                window.addEventListener('scroll', this.scrollListener);
+            }
+
+            toggleMusic() {
+                this.isMusicPlaying = !this.isMusicPlaying;
+                const audio = document.querySelector('audio');
+                if (audio) {
+                    if (this.isMusicPlaying) {
+                        audio.play().catch(e => console.log('Audio play failed:', e));
+                    } else {
+                        audio.pause();
+                    }
+                }
+            }
+
+            scrollToTop() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            }
+
+            onRSVPSubmit() {
+                if (this.rsvpData.name && this.rsvpData.phone) {
+                    // Here you would typically send data to a backend
+                    console.log('RSVP Data:', this.rsvpData);
+                    this.rsvpSubmitted = true;
+                    
+                    // Reset form after 3 seconds
+                    setTimeout(() => {
+                        this.rsvpSubmitted = false;
+                        this.rsvpData = { name: '', phone: '', email: '', guests: '1' };
+                    }, 3000);
+                }
+            }
+
+            formatDate(dateString) {
+                const date = new Date(dateString);
+                const options = { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                };
+                return date.toLocaleDateString('en-IN', options);
+            }
+        }
+
+        // Angular Module
+        @NgModule({
+            imports: [BrowserModule, CommonModule],
+            declarations: [WeddingInvitationComponent],
+            bootstrap: [WeddingInvitationComponent]
+        })
+        class WeddingInvitationModule { }
+
+        // Bootstrap the application
+        platformBrowserDynamic()
+            .bootstrapModule(WeddingInvitationModule)
+            .catch(err => console.error(err));
+
+        // Additional 3D Effects and Interactions
+        document.addEventListener('DOMContentLoaded', function() {
+            // Parallax effect for background elements
+            window.addEventListener('scroll', () => {
+                const scrolled = window.pageYOffset;
+                const parallaxElements = document.querySelectorAll('.hero-bg');
+                
+                parallaxElements.forEach(element => {
+                    const speed = 0.5;
+                    element.style.transform = `translateY(${scrolled * speed}px)`;
+                });
+            });
+
+            // 3D mouse movement effect
+            document.addEventListener('mousemove', (e) => {
+                const cards = document.querySelectorAll('.card-3d');
+                const mouseX = e.clientX / window.innerWidth;
+                const mouseY = e.clientY / window.innerHeight;
+                
+                cards.forEach(card => {
+                    const rotateX = (mouseY - 0.5) * 10;
+                    const rotateY = (mouseX - 0.5) * 10;
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+                });
+            });
+
+            // Add floating animation to decorative elements
+            const floatingElements = document.querySelectorAll('.decorative-line');
+            floatingElements.forEach((element, index) => {
+                element.style.animation = `float ${3 + index}s ease-in-out infinite`;
+                element.style.animationDelay = `${index * 0.5}s`;
+            });
+        });
+
+        // Three.js Background Animation (Optional Enhancement)
+        function initThreeJSBackground() {
+            const canvas = document.createElement('canvas');
+            canvas.style.position = 'fixed';
+            canvas.style.top = '0';
+            canvas.style.left = '0';
+            canvas.style.width = '100%';
+            canvas.style.height = '100%';
+            canvas.style.zIndex = '-1';
+            canvas.style.pointerEvents = 'none';
+            document.body.appendChild(canvas);
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true });
+            
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            
+            // Create floating particles
+            const geometry = new THREE.SphereGeometry(0.1, 8, 8);
+            const material = new THREE.MeshBasicMaterial({ 
+                color: 0xFFD700, 
+                transparent: true, 
+                opacity: 0.6 
+            });
+            
+            const particles = [];
+            for (let i = 0; i < 50; i++) {
+                const particle = new THREE.Mesh(geometry, material);
+                particle.position.set(
+                    (Math.random() - 0.5) * 20,
+                    (Math.random() - 0.5) * 20,
+                    (Math.random() - 0.5) * 20
+                );
+                particles.push(particle);
+                scene.add(particle);
+            }
+            
+            camera.position.z = 5;
+            
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                particles.forEach(particle => {
+                    particle.rotation.x += 0.01;
+                    particle.rotation.y += 0.01;
+                    particle.position.y += Math.sin(Date.now() * 0.001 + particle.position.x) * 0.002;
+                });
+                
+                renderer.render(scene, camera);
+            }
+            
+            animate();
+            
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        }
+
+        // Initialize Three.js background after page load
+        window.addEventListener('load', () => {
+            initThreeJSBackground();
+        });
+    </script>
+
+    <!-- Angular Forms Module Script -->
+    <script src="https://unpkg.com/@angular/forms@17/bundles/forms.umd.min.js"></script>
+    <script>
+        // Import FormsModule for ngModel
+        const { FormsModule } = ng.forms;
+        
+        // Update the module to include FormsModule
+        @NgModule({
+            imports: [BrowserModule, CommonModule, FormsModule],
+            declarations: [WeddingInvitationComponent],
+            bootstrap: [WeddingInvitationComponent]
+        })
+        class WeddingInvitationModule { }
+    </script>
+</body>
+</html>loading" [class.hidden]="!isLoading">
+                    <div class="loading-spinner"></div>
+                </div>
+
+                <div class="music-control" (click)="toggleMusic()">
+                    {{ isMusicPlaying ? '🔊' : '🔇' }} Music
+                </div>
+
+                <div class="

@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sita & Ram Wedding Invitation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      margin: 0;
+      font-family: "Georgia", serif;
+      background: radial-gradient(circle at center, #fff8f0, #fbe3c6);
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
+
+    /* MANDALA BACKGROUND */
+    #mandala-bg {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .mandala {
+      position: absolute;
+      opacity: 0.15;
+      animation: rotateMandala 60s linear infinite;
+    }
+    @keyframes rotateMandala {
+      from { transform: rotate(0deg) translate(-50%,-50%); }
+      to   { transform: rotate(360deg) translate(-50%,-50%); }
+    }
+
+    /* GENERAL CONTENT */
+    section {
+      position: relative;
+      z-index: 1;
+      padding: 60px 20px;
+      text-align: center;
+    }
+    h1,h2,h3 {
+      margin: 0 0 20px;
+      color: maroon;
+    }
+    p { color: #333; }
+
+    /* HERO CAROUSEL */
+    .carousel {
+      position: relative;
+      width: 100%; height: 90vh;
+      overflow: hidden;
+      perspective: 1000px;
+    }
+    .slides {
+      display: flex;
+      height: 100%;
+      animation: slideAnim 18s infinite;
+    }
+    .slide {
+      min-width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      font-size: 2rem;
+      color: maroon;
+      background: rgba(255,248,240,0.8);
+    }
+    .slide img {
+      max-height: 60%;
+      max-width: 90%;
+    }
+    @keyframes slideAnim {
+      0%,20% { transform: translateX(0%); }
+      25%,45% { transform: translateX(-100%); }
+      50%,70% { transform: translateX(-200%); }
+      75%,100% { transform: translateX(0%); }
+    }
+
+    /* COUNTDOWN */
+    .countdown {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+    .time-box {
+      background: maroon;
+      color: #fff;
+      padding: 15px;
+      border-radius: 12px;
+      min-width: 70px;
+      font-size: 1.2rem;
+    }
+
+    /* TIMELINE */
+    .timeline {
+      max-width: 600px;
+      margin: auto;
+      text-align: left;
+    }
+    .event {
+      background: #fff3e6;
+      border-left: 5px solid maroon;
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 8px;
+      animation: fadeInUp 1s ease;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+
+    /* BRIDE & GROOM */
+    .profile {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .profile img {
+      width: 150px; height: 150px;
+      border-radius: 50%;
+      border: 5px solid goldenrod;
+      margin-bottom: 15px;
+    }
+
+    /* MAP */
+    iframe { width: 100%; height: 300px; border: none; border-radius: 12px; }
+
+    /* RSVP */
+    form {
+      max-width: 400px;
+      margin: auto;
+      display: flex; flex-direction: column;
+      gap: 12px;
+    }
+    input, textarea, button {
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background: maroon;
+      color: #fff;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    button:hover { transform: scale(1.05); }
+
+    /* FOOTER */
+    footer {
+      background: maroon;
+      color: #fff;
+      padding: 20px;
+      position: relative;
+    }
+    .back-to-top {
+      position: absolute;
+      right: 20px; top: -20px;
+      background: goldenrod;
+      border-radius: 50%;
+      width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+    }
+
+    /* MUSIC TOGGLE */
+    #music-toggle {
+      position: fixed;
+      bottom: 20px; right: 20px;
+      background: goldenrod;
+      border: none;
+      border-radius: 50%;
+      width: 50px; height: 50px;
+      cursor: pointer;
+      z-index: 5;
+    }
+
+    /* RESPONSIVE */
+    @media(max-width:600px){
+      .carousel { height: 60vh; }
+      .slide { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- MANDALA BACKGROUND -->
+<div id="mandala-bg"></div>
+
+<!-- HERO -->
+<section class="carousel" id="home">
+  <div class="slides">
+    <div class="slide"><h1>Sita ❤️ Ram</h1><h3>December 5, 2025</h3></div>
+    <div class="slide"><img src="./bg2.png" alt="Bride Groom"></div>
+    <div class="slide"><img src="./bg3.png" alt="Family"></div>
+  </div>
+</section>
+
+<!-- COUNTDOWN -->
+<section id="countdown">
+  <h2>Countdown to our Wedding</h2>
+  <div class="countdown" id="timer"></div>
+</section>
+
+<!-- TIMELINE -->
+<section id="schedule">
+  <h2>Wedding Schedule</h2>
+  <div class="timeline">
+    <div class="event"><strong>Mehendi</strong> - Dec 3, 6PM, Bride's Residence</div>
+    <div class="event"><strong>Sangeet</strong> - Dec 4, 7PM, Kings Party Plot</div>
+    <div class="event"><strong>Wedding Ceremony</strong> - Dec 5, 9AM, Kings Party Plot</div>
+    <div class="event"><strong>Reception</strong> - Dec 6, 7PM, Kings Party Plot</div>
+  </div>
+</section>
+
+<!-- BRIDE -->
+<section id="bride">
+  <h2>The Bride</h2>
+  <div class="profile">
+    <img src="https://via.placeholder.com/150?text=Bride" alt="Bride">
+    <p>Sita, beloved daughter of Sharma family.</p>
+  </div>
+</section>
+
+<!-- GROOM -->
+<section id="groom">
+  <h2>The Groom</h2>
+  <div class="profile">
+    <img src="https://via.placeholder.com/150?text=Groom" alt="Groom">
+    <p>Ram, beloved son of Verma family.</p>
+  </div>
+</section>
+
+<!-- LOCATION -->
+<section id="location">
+  <h2>Venue</h2>
+  <p>Kings Party Plot, Rajkot, Gujarat, India</p>
+  <iframe src="https://www.google.com/maps/embed?pb=!1m18!..."></iframe>
+</section>
+
+<!-- RSVP -->
+<section id="rsvp">
+  <h2>RSVP</h2>
+  <form>
+    <input type="text" placeholder="Your Name" required>
+    <input type="tel" placeholder="Contact Number" required>
+    <button type="submit">Submit</button>
+  </form>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">⬆</div>
+  <p>“Two souls, one journey, a lifetime of love”</p>
+  <small>Crafted with ❤️ by JK</small>
+</footer>
+
+<!-- MUSIC -->
+<audio id="bg-music" loop autoplay muted>
+  <source src="assets/wedding-instrumental.mp3" type="audio/mpeg">
+</audio>
+<button id="music-toggle">🔈</button>
+
+<script>
+/* CONFIG */
+const weddingDate = new Date("2025-12-05T09:00:00+05:30");
+
+/* COUNTDOWN */
+function updateTimer(){
+  const now = new Date();
+  const diff = weddingDate - now;
+  if(diff <= 0) return;
+  const d = Math.floor(diff/1000/60/60/24);
+  const h = Math.floor(diff/1000/60/60)%24;
+  const m = Math.floor(diff/1000/60)%60;
+  const s = Math.floor(diff/1000)%60;
+  document.getElementById("timer").innerHTML = `
+    <div class="time-box">${d}<br><small>Days</small></div>
+    <div class="time-box">${h}<br><small>Hours</small></div>
+    <div class="time-box">${m}<br><small>Min</small></div>
+    <div class="time-box">${s}<br><small>Sec</small></div>
+  `;
+}
+setInterval(updateTimer,1000); updateTimer();
+
+/* MUSIC TOGGLE */
+const audio=document.getElementById("bg-music");
+const btn=document.getElementById("music-toggle");
+btn.onclick=()=>{
+  if(audio.muted){ audio.muted=false; btn.textContent="🔊";}
+  else{ audio.muted=true; btn.textContent="🔈";}
+};
+
+/* MANDALAS */
+function createMandala(size,color="maroon"){
+  const paths=Array.from({length:24}).map((_,i)=>
+    `<path d="M300 20 L315 70 L300 120 L285 70 Z"
+      transform="rotate(${i*15} 300 300) translate(0,180)" />`).join('');
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600"
+    width="${size}" height="${size}">
+    <g fill="none" stroke="${color}" stroke-width="2">${paths}</g></svg>`;
+}
+const container=document.getElementById("mandala-bg");
+[
+  {x:"5%",y:"5%",size:120,color:"goldenrod"},
+  {x:"90%",y:"10%",size:180,color:"maroon"},
+  {x:"10%",y:"90%",size:150,color:"darkred"},
+  {x:"85%",y:"85%",size:200,color:"gold"},
+  {x:"50%",y:"50%",size:400,color:"maroon"},
+  {x:"30%",y:"70%",size:100,color:"goldenrod"},
+  {x:"70%",y:"30%",size:130,color:"darkred"}
+].forEach((m,i)=>{
+  const div=document.createElement("div");
+  div.className="mandala";
+  div.style.left=m.x; div.style.top=m.y;
+  div.style.transform="translate(-50%,-50%)";
+  div.innerHTML=createMandala(m.size,m.color);
+  div.style.animationDuration=`${40+i*10}s`;
+  container.appendChild(div);
+});
+</script>
+</body>
+</html>

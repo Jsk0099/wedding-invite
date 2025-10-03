@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sangeet to Vows: Our Digital Invitation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore-compat.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
+        
+        :root {
+            --color-primary: #800000;
+            --color-secondary: #FFD700;
+            --color-tertiary: #F5F5DC;
+            --font-display: 'Playfair Display', serif;
+            --font-body: 'Inter', sans-serif;
+        }
+
+        body {
+            font-family: var(--font-body);
+            color: var(--color-primary);
+            background-color: var(--color-tertiary);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        .section {
+            padding: 4rem 1rem;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .title-font {
+            font-family: var(--font-display);
+        }
+
+        .bg-pattern-1 {
+            background-image: url('https://placehold.co/1000x1000/F5F5DC/800000?text=Floral+Mandala');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.1;
+        }
+
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .scroll-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background-color: var(--color-primary);
+            color: var(--color-tertiary);
+            padding: 0.75rem;
+            border-radius: 50%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: opacity 0.3s, transform 0.3s;
+            opacity: 0;
+            transform: translateY(20px);
+            z-index: 50;
+        }
+        .scroll-to-top.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .carousel-slide {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 1s ease-in-out;
+            opacity: 0;
+        }
+        .carousel-slide.active {
+            opacity: 1;
+        }
+        .carousel-image {
+            width: 100%;
+            height: 100%;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .carousel-content {
+            position: absolute;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .accordion-item {
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            max-height: 0;
+        }
+        .accordion-item.active {
+            max-height: 500px;
+        }
+        
+        .message-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(30, 41, 59, 0.95);
+            color: #e2e8f0;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            max-width: 400px;
+            text-align: center;
+            border: 1px solid rgba(71, 85, 105, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: none;
+        }
+
+        .message-box h2 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .message-box p {
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .message-box button {
+            background-color: #475569;
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 9999px;
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+
+        .message-box button:hover {
+            background-color: #64748b;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Mute/Unmute Button -->
+    <button id="music-toggle" class="fixed top-4 right-4 z-50 p-2 rounded-full bg-white bg-opacity-70 backdrop-blur-sm text-gray-800 shadow-lg">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path id="music-icon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.899a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1V6a1 1 0 011-1h1.586l4.707-4.707a1 1 0 011.414 0z" />
+        </svg>
+    </button>
+    <audio id="background-music" loop preload="auto">
+        <source src="https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- 3D Background Canvas -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Hero Section -->
+    <div class="carousel-container" id="hero-section">
+        <div class="carousel-slide active" id="slide-1">
+            <div class="carousel-image" style="background-image: url('https://placehold.co/1080x1920/F5F5DC/800000?text=Bride+%26+Groom');"></div>
+            <div class="carousel-content">
+                <h2 class="title-font text-2xl md:text-5xl font-bold text-center">Meera & Arjun</h2>
+                <p class="title-font text-lg md:text-2xl mt-2 text-center">Two Souls, One Journey</p>
+                <p class="mt-4 text-center text-sm md:text-base">November 25, 2025</p>
+            </div>
+        </div>
+        <div class="carousel-slide" id="slide-2">
+            <div class="carousel-image" style="background-image: url('https://placehold.co/1080x1920/F5F5DC/800000?text=Animated+Couple');"></div>
+            <div class="carousel-content">
+                <p class="title-font text-2xl md:text-5xl font-bold text-center">The Beginning of Forever</p>
+            </div>
+        </div>
+        <div class="carousel-slide" id="slide-3">
+            <div class="carousel-image" style="background-image: url('https://placehold.co/1080x1920/F5F5DC/800000?text=Family');"></div>
+            <div class="carousel-content">
+                <p class="title-font text-2xl md:text-5xl font-bold text-center">With Blessings from our Families</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Countdown Timer -->
+    <div class="section bg-pattern-1 text-center">
+        <h2 class="title-font text-3xl md:text-5xl font-bold mb-8">The Countdown Begins</h2>
+        <div class="flex justify-center items-center space-x-4 md:space-x-8">
+            <div class="flex flex-col items-center">
+                <span id="days" class="title-font text-4xl md:text-7xl font-bold text-gray-800">00</span>
+                <span class="text-sm md:text-base mt-2">Days</span>
+            </div>
+            <span class="title-font text-4xl md:text-7xl">:</span>
+            <div class="flex flex-col items-center">
+                <span id="hours" class="title-font text-4xl md:text-7xl font-bold text-gray-800">00</span>
+                <span class="text-sm md:text-base mt-2">Hours</span>
+            </div>
+            <span class="title-font text-4xl md:text-7xl">:</span>
+            <div class="flex flex-col items-center">
+                <span id="minutes" class="title-font text-4xl md:text-7xl font-bold text-gray-800">00</span>
+                <span class="text-sm md:text-base mt-2">Minutes</span>
+            </div>
+            <span class="title-font text-4xl md:text-7xl">:</span>
+            <div class="flex flex-col items-center">
+                <span id="seconds" class="title-font text-4xl md:text-7xl font-bold text-gray-800">00</span>
+                <span class="text-sm md:text-base mt-2">Seconds</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Wedding Schedule Section -->
+    <div class="section">
+        <h2 class="title-font text-3xl md:text-5xl font-bold text-center mb-12">Wedding Celebrations</h2>
+        <div class="max-w-4xl mx-auto space-y-8">
+            <div class="accordion-header cursor-pointer bg-red-800 text-white rounded-lg p-6 shadow-lg hover:bg-red-700 transition-colors duration-300">
+                <h3 class="title-font text-xl md:text-2xl font-bold">Sangeet & Cocktail Night</h3>
+                <p class="mt-2 text-sm md:text-base">An evening of music, dance, and celebration.</p>
+            </div>
+            <div class="accordion-item">
+                <div class="p-6 bg-white rounded-lg shadow-inner mt-2 border border-red-200">
+                    <p class="font-bold">Date: November 24, 2025</p>
+                    <p class="font-bold">Time: 7:00 PM onwards</p>
+                    <p class="font-bold">Venue: The Grand Ballroom</p>
+                    <p class="mt-4">Join us for a magical evening as we dance the night away! Your presence will make our celebrations complete.</p>
+                </div>
+            </div>
+
+            <div class="accordion-header cursor-pointer bg-red-800 text-white rounded-lg p-6 shadow-lg hover:bg-red-700 transition-colors duration-300">
+                <h3 class="title-font text-xl md:text-2xl font-bold">Wedding Ceremony</h3>
+                <p class="mt-2 text-sm md:text-base">The sacred moment we say "I do."</p>
+            </div>
+            <div class="accordion-item">
+                <div class="p-6 bg-white rounded-lg shadow-inner mt-2 border border-red-200">
+                    <p class="font-bold">Date: November 25, 2025</p>
+                    <p class="font-bold">Time: 10:00 AM onwards</p>
+                    <p class="font-bold">Venue: The Royal Gardens</p>
+                    <p class="mt-4">We would be honored to have you witness our union and bless us as we begin our new life together.</p>
+                </div>
+            </div>
+
+            <div class="accordion-header cursor-pointer bg-red-800 text-white rounded-lg p-6 shadow-lg hover:bg-red-700 transition-colors duration-300">
+                <h3 class="title-font text-xl md:text-2xl font-bold">Reception</h3>
+                <p class="mt-2 text-sm md:text-base">A grand feast and celebration of love.</p>
+            </div>
+            <div class="accordion-item">
+                <div class="p-6 bg-white rounded-lg shadow-inner mt-2 border border-red-200">
+                    <p class="font-bold">Date: November 25, 2025</p>
+                    <p class="font-bold">Time: 8:00 PM onwards</p>
+                    <p class="font-bold">Venue: The Royal Gardens</p>
+                    <p class="mt-4">Come and share in our joy with delicious food, music, and unforgettable memories.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bride & Groom Sections -->
+    <div class="section bg-pattern-1 grid md:grid-cols-2 gap-16 items-center">
+        <div class="text-center md:text-left">
+            <h2 class="title-font text-3xl md:text-5xl font-bold mb-4">The Bride</h2>
+            <div class="mx-auto md:mx-0 w-64 h-64 md:w-80 md:h-80 rounded-full overflow-hidden mb-6 border-4 border-red-800 shadow-xl transform transition-transform duration-500 hover:scale-105">
+                <img src="https://placehold.co/800x800/800000/F5F5DC?text=Bride+Illustration" alt="Bride" class="w-full h-full object-cover">
+            </div>
+            <h3 class="title-font text-2xl font-bold">Meera Sharma</h3>
+            <p class="mt-2">Daughter of Mr. & Mrs. Sharma</p>
+            <p class="mt-4 max-w-lg mx-auto md:mx-0">With a heart full of dreams and a spirit of grace, Meera is ready to embark on her new journey with Arjun.</p>
+        </div>
+        <div class="text-center md:text-right md:order-first">
+            <h2 class="title-font text-3xl md:text-5xl font-bold mb-4">The Groom</h2>
+            <div class="mx-auto md:mx-0 w-64 h-64 md:w-80 md:h-80 rounded-full overflow-hidden mb-6 border-4 border-red-800 shadow-xl transform transition-transform duration-500 hover:scale-105">
+                <img src="https://placehold.co/800x800/800000/F5F5DC?text=Groom+Illustration" alt="Groom" class="w-full h-full object-cover">
+            </div>
+            <h3 class="title-font text-2xl font-bold">Arjun Patel</h3>
+            <p class="mt-2">Son of Mr. & Mrs. Patel</p>
+            <p class="mt-4 max-w-lg mx-auto md:mx-0">Arjun, a man of integrity and warmth, looks forward to a lifetime of love and adventure with his beloved, Meera.</p>
+        </div>
+    </div>
+
+    <!-- Location Section -->
+    <div class="section text-center">
+        <h2 class="title-font text-3xl md:text-5xl font-bold mb-8">Location & Venue</h2>
+        <div class="flex justify-center mb-8">
+            <p class="max-w-xl">Join us at the beautiful Grand Hyatt, New Delhi, as we celebrate our union. Your presence means the world to us!</p>
+        </div>
+        <div class="w-full h-96 rounded-xl shadow-lg overflow-hidden border-2 border-red-800">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3502.810578680674!2d77.10099511508216!3d28.60460488242491!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390d1bc719717d1f%3A0x67a3a69622d992e5!2sGrand%20Hyatt%20New%20Delhi!5e0!3m2!1sen!2sin!4v1625907409247!5m2!1sen!2sin" 
+                    width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+        </div>
+    </div>
+
+    <!-- RSVP Section -->
+    <div class="section bg-pattern-1 text-center">
+        <h2 class="title-font text-3xl md:text-5xl font-bold mb-8">Please RSVP</h2>
+        <div id="rsvp-status" class="mb-4 text-green-600 font-bold hidden">Thank you for your response!</div>
+        <form id="rsvp-form" class="max-w-md mx-auto p-8 bg-white rounded-xl shadow-2xl border-2 border-red-800">
+            <p class="mb-6">Please let us know if you can make it, so we can make the necessary arrangements.</p>
+            <div class="mb-4 text-left">
+                <label for="name" class="block font-bold mb-2">Full Name</label>
+                <input type="text" id="name" name="name" class="w-full p-3 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-red-500 transition-colors" required>
+            </div>
+            <div class="mb-4 text-left">
+                <label for="contact" class="block font-bold mb-2">Contact Details</label>
+                <input type="text" id="contact" name="contact" class="w-full p-3 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-red-500 transition-colors" required>
+            </div>
+            <button type="submit" class="w-full py-3 mt-6 bg-red-800 text-white font-bold rounded-lg hover:bg-red-700 transition-all duration-300 transform hover:scale-105">
+                Submit
+            </button>
+        </form>
+    </div>
+
+    <!-- Footer -->
+    <div class="section bg-red-800 text-center text-white py-12">
+        <p class="title-font text-xl md:text-3xl font-bold">"Two souls, one journey, a lifetime of love."</p>
+        <p class="mt-6 text-sm">Website created with love by a passionate developer.</p>
+    </div>
+
+    <!-- Custom message box -->
+    <div id="message-box" class="message-box">
+        <h2 id="message-title"></h2>
+        <p id="message-text"></p>
+        <button id="message-ok">OK</button>
+    </div>
+
+    <button id="scroll-to-top" class="scroll-to-top">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+        </svg>
+    </button>
+
+    <script>
+        // Global variables for Firebase
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        
+        // Custom message box functions
+        function showMessageBox(title, text) {
+            const messageBox = document.getElementById('message-box');
+            document.getElementById('message-title').textContent = title;
+            document.getElementById('message-text').textContent = text;
+            messageBox.style.display = 'block';
+        }
+        function hideMessageBox() {
+            const messageBox = document.getElementById('message-box');
+            messageBox.style.display = 'none';
+        }
+
+        let db, auth, userId;
+
+        // Firebase Initialization and Authentication
+        async function initializeFirebase() {
+            try {
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(firebaseConfig);
+                }
+                db = firebase.firestore();
+                auth = firebase.auth();
+                
+                if (initialAuthToken) {
+                    await auth.signInWithCustomToken(initialAuthToken);
+                } else {
+                    await auth.signInAnonymously();
+                }
+                
+                auth.onAuthStateChanged(user => {
+                    if (user) {
+                        userId = user.uid;
+                        console.log("Firebase initialized and user authenticated:", userId);
+                    } else {
+                        console.log("No user is signed in.");
+                        userId = `anon-${crypto.randomUUID()}`;
+                    }
+                });
+            } catch (e) {
+                console.error("Firebase initialization or auth error:", e);
+                showMessageBox("Error", "There was an issue connecting to the database. Please try again later.");
+            }
+        }
+
+        // Countdown Timer Logic
+        const weddingDate = new Date("November 25, 2025 10:00:00").getTime();
+        const countdownElements = {
+            days: document.getElementById('days'),
+            hours: document.getElementById('hours'),
+            minutes: document.getElementById('minutes'),
+            seconds: document.getElementById('seconds')
+        };
+        const updateCountdown = () => {
+            const now = new Date().getTime();
+            const distance = weddingDate - now;
+
+            if (distance < 0) {
+                clearInterval(countdownInterval);
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            countdownElements.days.textContent = days.toString().padStart(2, '0');
+            countdownElements.hours.textContent = hours.toString().padStart(2, '0');
+            countdownElements.minutes.textContent = minutes.toString().padStart(2, '0');
+            countdownElements.seconds.textContent = seconds.toString().padStart(2, '0');
+        };
+        const countdownInterval = setInterval(updateCountdown, 1000);
+
+        // Carousel Logic
+        const slides = document.querySelectorAll('.carousel-slide');
+        let currentSlide = 0;
+        const showSlide = (n) => {
+            slides.forEach(slide => slide.classList.remove('active'));
+            slides[n].classList.add('active');
+        };
+        const nextSlide = () => {
+            currentSlide = (currentSlide + 1) % slides.length;
+            showSlide(currentSlide);
+        };
+        setInterval(nextSlide, 5000);
+
+        // Music Toggle Logic
+        const music = document.getElementById('background-music');
+        const musicToggle = document.getElementById('music-toggle');
+        let isMuted = true;
+        musicToggle.addEventListener('click', () => {
+            if (isMuted) {
+                music.play();
+                isMuted = false;
+                musicToggle.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.899a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1V6a1 1 0 011-1h1.586l4.707-4.707a1 1 0 011.414 0z" /></svg>`;
+            } else {
+                music.pause();
+                isMuted = true;
+                musicToggle.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.757 16.757a4 4 0 01-5.656-5.657m5.656 5.657a4 4 0 015.656-5.657m-5.656 5.657l5.656-5.657M15.536 8.464a5 5 0 010 7.072m2.828-9.899a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1V6a1 1 0 011-1h1.586l4.707-4.707a1 1 0 011.414 0z" /></svg>`;
+            }
+        });
+
+        // Accordion Logic
+        document.querySelectorAll('.accordion-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const item = header.nextElementSibling;
+                const activeItems = document.querySelectorAll('.accordion-item.active');
+                if (item.classList.contains('active')) {
+                    item.classList.remove('active');
+                } else {
+                    activeItems.forEach(activeItem => activeItem.classList.remove('active'));
+                    item.classList.add('active');
+                }
+            });
+        });
+
+        // RSVP Form
+        const rsvpForm = document.getElementById('rsvp-form');
+        const rsvpStatus = document.getElementById('rsvp-status');
+        const rsvpEnabled = true;
+
+        if (rsvpForm) {
+            if (rsvpEnabled) {
+                rsvpForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    if (!userId) {
+                        showMessageBox("Error", "Authentication is still in progress. Please try again in a moment.");
+                        return;
+                    }
+                    const name = e.target.name.value;
+                    const contact = e.target.contact.value;
+
+                    try {
+                        const docRef = await db.collection(`artifacts/${appId}/public/data/rsvps`).add({
+                            name,
+                            contact,
+                            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                        console.log("RSVP submitted with ID: ", docRef.id);
+                        rsvpForm.reset();
+                        rsvpForm.style.display = 'none';
+                        rsvpStatus.style.display = 'block';
+                        showMessageBox("Success", "Your RSVP has been submitted successfully!");
+                    } catch (e) {
+                        console.error("Error adding document: ", e);
+                        showMessageBox("Error", "There was an issue submitting your RSVP. Please try again.");
+                    }
+                });
+            } else {
+                rsvpForm.innerHTML = `<p class="text-center font-bold text-red-800">RSVP submissions are currently closed.</p>`;
+            }
+        }
+
+        // Scroll-to-top button logic
+        const scrollToTopBtn = document.getElementById('scroll-to-top');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                scrollToTopBtn.classList.add('show');
+            } else {
+                scrollToTopBtn.classList.remove('show');
+            }
+        });
+        scrollToTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // 3D Torus Knot Logic
+        let scene, camera, renderer, torusKnot, controls;
+
+        function initThreeJS() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 20;
+            
+            renderer = new THREE.WebGLRenderer({ antialiasing: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(0x000000, 0);
+            document.getElementById('bg-canvas').appendChild(renderer.domElement);
+
+            // OrbitControls for camera interaction
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.screenSpacePanning = false;
+
+            // Create the golden torus knot
+            const geometry = new THREE.TorusKnotGeometry(6, 1.5, 100, 16);
+            const material = new THREE.MeshStandardMaterial({
+                color: 0xFFD700, // Gold color
+                metalness: 0.9,
+                roughness: 0.1
+            });
+            torusKnot = new THREE.Mesh(geometry, material);
+            scene.add(torusKnot);
+
+            // Add lighting
+            const pointLight = new THREE.PointLight(0xFFFFFF, 1, 100);
+            pointLight.position.set(10, 10, 10);
+            scene.add(pointLight);
+
+            const ambientLight = new THREE.AmbientLight(0x404040);
+            scene.add(ambientLight);
+
+            window.addEventListener('resize', onWindowResize, false);
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Rotate the torus knot
+            torusKnot.rotation.x += 0.005;
+            torusKnot.rotation.y += 0.005;
+
+            // Update OrbitControls
+            controls.update();
+            
+            renderer.render(scene, camera);
+        }
+
+        window.onload = function() {
+            document.getElementById('message-ok').addEventListener('click', hideMessageBox);
+            // initializeFirebase();
+            initThreeJS();
+            animate();
+        };
+    </script>
+</body>
+</html>

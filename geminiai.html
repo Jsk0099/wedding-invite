@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sangeet & Priya's Wedding</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-thumb { background-color: #A0522D; border-radius: 4px; }
+        ::-webkit-scrollbar-track { background-color: #FFFAF0; }
+        .parallax-bg { background-position: center; background-size: cover; transform-style: preserve-3d; }
+        .hero-bg { background-image: url('./bg3.png'); }
+        .section-bg-1 { background-image: url('./bg4.jpg'); }
+        .animated-entry { opacity: 0; transform: translateY(50px); transition: all 1s ease-out; }
+        .visible { opacity: 1; transform: translateY(0); }
+        .bg-gradient-custom { background: linear-gradient(135deg, #A0522D, #FFD700); }
+        .pulse-once { animation: pulse-once 1s ease-in-out; }
+        @keyframes pulse-once { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        .unmute-button { transition: transform 0.3s ease; }
+        .unmute-button:hover { transform: scale(1.1); }
+        /* Countdown animation */
+        .countdown-number { transition: transform 0.5s ease-out; }
+        .countdown-number.out { transform: translateY(-100%); opacity: 0; }
+        .countdown-number.in { transform: translateY(0); opacity: 1; }
+
+        #three-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        /* Custom map marker animation */
+        .map-marker {
+            width: 3rem;
+            height: 3rem;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.9); opacity: 1; }
+            70% { transform: scale(1.2); opacity: 0.7; }
+            100% { transform: scale(0.9); opacity: 1; }
+        }
+
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #FFF8DC;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            transition: opacity 0.5s ease-out;
+        }
+        
+        .carousel-slide {
+            background-size: contain; /* Ensures the whole image is visible */
+            background-repeat: no-repeat; /* Prevents the image from tiling */
+            background-position: center; /* Centers the image */
+            background-color: #4B372F; /* Adds a background color behind the image */
+        }
+    </style>
+</head>
+<body class="bg-[#FFFAF0] text-[#4B372F]">
+
+    <div id="loading-screen">
+        <div class="text-2xl text-[#A0522D] animate-pulse">Loading...</div>
+    </div>
+    <audio id="bg-music" loop muted>
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <div id="three-container"></div>
+    
+    <!-- Hero Section -->
+    <section id="hero-section" class="relative w-full h-screen overflow-hidden flex items-center justify-center text-center text-white bg-cover bg-center">
+        <!-- Carousel Container -->
+        <div id="carousel" class="absolute inset-0 z-0">
+            <!-- Slides will be added dynamically by JS -->
+        </div>
+
+        <div class="relative z-10 p-8 md:p-12 lg:p-16 bg-black bg-opacity-40 rounded-3xl shadow-2xl">
+            <h1 id="hero-title" class="text-4xl md:text-6xl lg:text-7xl font-bold mb-4 font-serif text-[#FFD700]"></h1>
+            <p id="hero-subtitle" class="text-xl md:text-2xl lg:text-3xl font-light tracking-wide text-[#FFFAF0]"></p>
+        </div>
+        <button id="unmute-btn" class="unmute-button fixed bottom-8 right-8 z-50 p-4 bg-white rounded-full shadow-lg border border-[#A0522D] text-[#A0522D] text-2xl">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8">
+                <path d="M13.5 4.062c0-1.074-1.107-1.746-2.008-1.128L5.58 6.204a1.25 1.25 0 0 0-.858 1.127v10.538c0 .89.923 1.464 1.794.997l7.585-4.22c.87-.484.87-1.285 0-1.768l-7.585-4.22a1.25 1.25 0 0 0-1.794.997l-.271 2.221-.303-.545A2.25 2.25 0 0 1 4.5 12.25a2.25 2.25 0 0 1 1.708-2.18l.19-.056.27-.486 4.757-2.65ZM14.192 4.674l5.421 9.609c.642 1.139-.245 2.545-1.503 2.545-.306 0-.598-.103-.84-.28l-3.237-2.39L14.192 4.674ZM20.73 7.843c1.258 0 2.146 1.406 1.503 2.545l-5.421 9.609c-.242.43-.534.633-.84.633-1.258 0-2.146-1.406-1.503-2.545l5.421-9.609Z" />
+            </svg>
+        </button>
+    </section>
+
+    <!-- Countdown Section -->
+    <section id="countdown" class="relative w-full py-16 text-center overflow-hidden animated-entry">
+        <div class="parallax-bg section-bg-1 absolute inset-0 z-0 opacity-20"></div>
+        <div class="relative z-10 p-8 md:p-12 lg:p-16 bg-[#FDF8F3] bg-opacity-70 rounded-3xl shadow-lg max-w-4xl mx-auto">
+            <h2 class="text-4xl md:text-5xl font-bold text-[#A0522D] mb-8">The Countdown Begins!</h2>
+            <div id="countdown-timer" class="flex justify-center space-x-4 md:space-x-8 lg:space-x-12">
+                <div class="flex flex-col items-center">
+                    <span id="days" class="text-5xl md:text-7xl lg:text-8xl font-black text-[#A0522D] relative w-24 md:w-32 h-24 md:h-32 flex items-center justify-center">00</span>
+                    <span class="text-sm md:text-lg font-medium mt-2 text-[#A0522D]">Days</span>
+                </div>
+                <div class="flex flex-col items-center">
+                    <span id="hours" class="text-5xl md:text-7xl lg:text-8xl font-black text-[#A0522D] relative w-24 md:w-32 h-24 md:h-32 flex items-center justify-center">00</span>
+                    <span class="text-sm md:text-lg font-medium mt-2 text-[#A0522D]">Hours</span>
+                </div>
+                <div class="flex flex-col items-center">
+                    <span id="minutes" class="text-5xl md:text-7xl lg:text-8xl font-black text-[#A0522D] relative w-24 md:w-32 h-24 md:h-32 flex items-center justify-center">00</span>
+                    <span class="text-sm md:text-lg font-medium mt-2 text-[#A0522D]">Minutes</span>
+                </div>
+                <div class="flex flex-col items-center">
+                    <span id="seconds" class="text-5xl md:text-7xl lg:text-8xl font-black text-[#A0522D] relative w-24 md:w-32 h-24 md:h-32 flex items-center justify-center">00</span>
+                    <span class="text-sm md:text-lg font-medium mt-2 text-[#A0522D]">Seconds</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Wedding Schedule Section -->
+    <section id="schedule" class="relative w-full py-16 bg-[#FFF8DC] overflow-hidden animated-entry">
+        <div class="max-w-6xl mx-auto px-4 md:px-8">
+            <h2 class="text-4xl md:text-5xl font-bold text-center text-[#A0522D] mb-4">Our Celebration</h2>
+            <p class="text-center text-lg md:text-xl font-light mb-12 text-[#4B372F]">We warmly invite you to join our celebrations!</p>
+            <div id="schedule-timeline" class="space-y-8">
+                <!-- Schedule items will be dynamically created by JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- The Couple Section -->
+    <section id="the-couple" class="w-full py-16 bg-[#FFFAF0] overflow-hidden">
+        <div class="max-w-6xl mx-auto px-4 md:px-8">
+            <!-- Bride Section -->
+            <div id="bride-section" class="flex flex-col md:flex-row items-center justify-center gap-12 mb-16 animated-entry">
+                <div class="w-full md:w-1/2 flex justify-center">
+                    <div class="w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl bg-[#FFF8DC] p-4">
+                        <!-- <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto">
+                            <rect width="100" height="100" fill="#E8B095" rx="10" />
+                            <circle cx="50" cy="30" r="15" fill="#C1694F" />
+                            <path d="M 50 45 Q 65 80, 50 100 Q 35 80, 50 45 Z" fill="#A0522D" />
+                            <rect x="30" y="25" width="40" height="2" fill="#FFD700" />
+                            <path d="M 40 40 L 45 42 L 50 40 L 55 42 L 60 40" fill="none" stroke="#FFD700" stroke-width="2" />
+                            <text x="50" y="60" font-size="6" text-anchor="middle" fill="#FFD700">Priya</text>
+                            <text x="50" y="70" font-size="4" text-anchor="middle" fill="#4B372F">Daughter of Mr. and Mrs. Sharma</text>
+                        </svg> -->
+                        <img src="./bride.png" alt="Bride"/>
+                    </div>
+                </div>
+                <div class="w-full md:w-1/2 text-center md:text-left">
+                    <h3 class="text-3xl font-bold text-[#A0522D] mb-4">The Bride</h3>
+                    <p class="text-lg text-[#4B372F]">Priya, a compassionate and artistic soul, loves to paint and spends her free time volunteering. Her infectious laughter and kind heart have brought immense joy to everyone around her. She has always dreamed of a life filled with love and creativity, and she found it in Sangeet.</p>
+                </div>
+            </div>
+
+            <!-- Groom Section -->
+            <div id="groom-section" class="flex flex-col-reverse md:flex-row items-center justify-center gap-12 animated-entry">
+                <div class="w-full md:w-1/2 text-center md:text-right">
+                    <h3 class="text-3xl font-bold text-[#A0522D] mb-4">The Groom</h3>
+                    <p class="text-lg text-[#4B372F]">Sangeet, a dedicated engineer with a passion for music, finds harmony in both his code and his guitar. He is a thoughtful and reliable partner, and his calm presence has been a constant source of strength. He is excited to embark on this beautiful journey with his best friend, Priya.</p>
+                </div>
+                <div class="w-full md:w-1/2 flex justify-center">
+                    <div class="w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl bg-[#FFF8DC] p-4">
+                        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto">
+                            <rect width="100" height="100" fill="#6985B0" rx="10" />
+                            <circle cx="50" cy="30" r="15" fill="#3D566B" />
+                            <path d="M 50 45 Q 65 80, 50 100 Q 35 80, 50 45 Z" fill="#2E4057" />
+                            <rect x="30" y="25" width="40" height="2" fill="#FFD700" />
+                            <path d="M 40 40 L 45 42 L 50 40 L 55 42 L 60 40" fill="none" stroke="#FFD700" stroke-width="2" />
+                            <text x="50" y="60" font-size="6" text-anchor="middle" fill="#FFD700">Sangeet</text>
+                            <text x="50" y="70" font-size="4" text-anchor="middle" fill="#FFFFFF">Son of Mr. and Mrs. Kapoor</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Location Section -->
+    <section id="location" class="relative w-full py-16 bg-[#FDF8F3] overflow-hidden animated-entry">
+        <div class="max-w-6xl mx-auto px-4 md:px-8">
+            <h2 class="text-4xl md:text-5xl font-bold text-center text-[#A0522D] mb-4">The Venue</h2>
+            <p class="text-center text-lg md:text-xl font-light mb-8 text-[#4B372F]">Come celebrate with us at our beautiful wedding venue!</p>
+            <div class="relative w-full h-96 rounded-3xl overflow-hidden shadow-2xl">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3671.9793796843467!2d72.50293117505086!3d23.02381277916568!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x395e840d276b13b1%3A0xc3f1f77d5a570c91!2sThe%20Hyatt%20Regency%20Ahmedabad!5e0!3m2!1sen!2sin!4v1690022097780!5m2!1sen!2sin" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 map-marker">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#A0522D" class="w-full h-full">
+                        <path fill-rule="evenodd" d="M11.54 22.351A8.25 8.25 0 0 1 12 21.75c2.471 0 4.714-.852 6.5-2.264l-3.95-3.95a.75.75 0 0 0-1.06 1.06L14.498 18c-1.84 1.487-4.14 2.45-6.648 2.45a8.25 8.25 0 0 1-5.836-2.417c-.46-.46-.46-1.205 0-1.666l3.95-3.95a.75.75 0 0 0 1.06 1.06l-3.95 3.95a6.75 6.75 0 0 0 4.776 1.976c1.674 0 3.238-.636 4.417-1.78l3.95 3.95a.75.75 0 0 0 1.06-1.06L14.582 17.5a6.75 6.75 0 0 0 4.776-1.976c.46-.46.46-1.205 0-1.666l-3.95-3.95a.75.75 0 0 0-1.06 1.06l3.95 3.95c1.84 1.487 4.14 2.45 6.648 2.45a8.25 8.25 0 0 1-5.836 2.417c-.46.46-.46 1.205 0 1.666l3.95 3.95a.75.75 0 0 0 1.06 1.06z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- RSVP Section -->
+    <section id="rsvp" class="relative w-full py-16 bg-[#FFF8DC] overflow-hidden animated-entry">
+        <div class="max-w-xl mx-auto px-4 md:px-8 text-center">
+            <h2 class="text-4xl md:text-5xl font-bold text-[#A0522D] mb-4">RSVP</h2>
+            <p class="text-lg md:text-xl font-light mb-8 text-[#4B372F]">Please let us know if you can make it!</p>
+            <div id="rsvp-status-container">
+                <!-- RSVP Form -->
+                <form id="rsvp-form" class="space-y-6">
+                    <div>
+                        <input type="text" id="name" name="name" placeholder="Your Name" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#A0522D] bg-white text-[#4B372F] transition-all">
+                    </div>
+                    <div>
+                        <input type="email" id="contact" name="contact" placeholder="Your Email or Phone Number" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#A0522D] bg-white text-[#4B372F] transition-all">
+                    </div>
+                    <button type="submit" class="w-full bg-gradient-custom text-white font-semibold py-3 px-6 rounded-full shadow-lg hover:scale-105 transition-transform duration-300 animate-pulse-once">
+                        Submit RSVP
+                    </button>
+                    <div id="rsvp-message" class="text-center mt-4 font-semibold text-[#A0522D]"></div>
+                </form>
+                <!-- RSVP Closed Message -->
+                <div id="rsvp-closed-message" class="hidden text-xl text-center text-[#A0522D] font-bold">
+                    The RSVP period has now closed. We look forward to celebrating with you!
+                </div>
+            </div>
+        </div>
+        <div id="user-info" class="text-center text-sm mt-8 text-gray-500"></div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="relative w-full py-12 bg-[#A0522D] text-white overflow-hidden text-center">
+        <div class="max-w-6xl mx-auto px-4 md:px-8">
+            <p class="text-2xl font-light mb-4 italic">“Two souls, one journey, a lifetime of love.”</p>
+            <p class="text-sm">Made with ❤️ by a wonderful developer.</p>
+            <button id="back-to-top" class="fixed bottom-8 right-8 z-50 p-4 bg-white rounded-full shadow-lg border border-[#A0522D] text-[#A0522D] transition-transform duration-300 hover:scale-110">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                    <path fill-rule="evenodd" d="M11.47 7.72a.75.75 0 0 1 1.06 0l7.5 7.5a.75.75 0 1 1-1.06 1.06L12 9.31l-6.97 6.97a.75.75 0 0 1-1.06-1.06l7.5-7.5Z" clip-rule="evenodd" />
+                </svg>
+            </button>
+        </div>
+    </footer>
+    
+    <!-- Firebase Libraries -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global variables provided by the environment
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        let app, db, auth, userId;
+
+        // Initialize Firebase
+        if (Object.keys(firebaseConfig).length > 0) {
+            try {
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                console.log("Firebase initialized successfully.");
+
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        console.log("User authenticated:", userId);
+                        document.getElementById('user-info').textContent = `Your User ID: ${userId}`;
+                        setupRealtimeRSVP();
+                    } else {
+                        console.log("No user authenticated. Attempting anonymous sign-in.");
+                        try {
+                            await signInAnonymously(auth);
+                            console.log("Signed in anonymously.");
+                        } catch (e) {
+                            console.error("Anonymous sign-in failed:", e);
+                        }
+                    }
+                });
+                
+                if (initialAuthToken) {
+                    signInWithCustomToken(auth, initialAuthToken).catch(e => {
+                        console.error("Custom token sign-in failed:", e);
+                        // Fallback to anonymous sign-in is handled by onAuthStateChanged
+                    });
+                } else {
+                    signInAnonymously(auth).catch(e => {
+                        console.error("Anonymous sign-in failed during initial setup:", e);
+                    });
+                }
+            } catch (e) {
+                console.error("Firebase initialization failed:", e);
+            }
+        } else {
+            console.error("Firebase config is not available. RSVP functionality will be disabled.");
+            document.getElementById('rsvp-form').classList.add('hidden');
+            document.getElementById('rsvp-closed-message').classList.remove('hidden');
+        }
+
+        function setupRealtimeRSVP() {
+            if (!db) return;
+            const settingsDocRef = doc(db, `/artifacts/${appId}/public/data/settings/app_settings`);
+            onSnapshot(settingsDocRef, (doc) => {
+                if (doc.exists()) {
+                    const data = doc.data();
+                    if (data.rsvpEnabled === false) {
+                        document.getElementById('rsvp-form').classList.add('hidden');
+                        document.getElementById('rsvp-closed-message').classList.remove('hidden');
+                    } else {
+                        document.getElementById('rsvp-form').classList.remove('hidden');
+                        document.getElementById('rsvp-closed-message').classList.add('hidden');
+                    }
+                } else {
+                    console.log("App settings document not found, enabling RSVP by default.");
+                    document.getElementById('rsvp-form').classList.remove('hidden');
+                    document.getElementById('rsvp-closed-message').classList.add('hidden');
+                    setDoc(settingsDocRef, { rsvpEnabled: true });
+                }
+            }, (error) => {
+                console.error("Error listening to settings:", error);
+            });
+        }
+        
+        // Website Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const loadingScreen = document.getElementById('loading-screen');
+            setTimeout(() => {
+                loadingScreen.style.opacity = '0';
+                setTimeout(() => loadingScreen.style.display = 'none', 500);
+            }, 1500);
+
+            // Audio Controls
+            const bgMusic = document.getElementById('bg-music');
+            const unmuteBtn = document.getElementById('unmute-btn');
+            let isMuted = true;
+            unmuteBtn.addEventListener('click', () => {
+                if (isMuted) {
+                    bgMusic.muted = false;
+                    bgMusic.play();
+                    unmuteBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8">
+                        <path d="M13.5 4.062c0-1.074-1.107-1.746-2.008-1.128L5.58 6.204a1.25 1.25 0 0 0-.858 1.127v10.538c0 .89.923 1.464 1.794.997l7.585-4.22c.87-.484.87-1.285 0-1.768l-7.585-4.22a1.25 1.25 0 0 0-1.794.997l-.271 2.221-.303-.545A2.25 2.25 0 0 1 4.5 12.25a2.25 2.25 0 0 1 1.708-2.18l.19-.056.27-.486 4.757-2.65ZM15.626 9.87c.338-.088.67-.179 1.002-.27l3.965-1.034a.75.75 0 0 1 .904.475l.175.71a.75.75 0 0 1-.475.904l-3.965 1.034a1.75 1.75 0 0 0-1.002.27c-.447.116-.764.55-.764 1.018V12a1.75 1.75 0 0 0 1.002.936c.338.088.67.179 1.002.27l3.965 1.034a.75.75 0 0 1 .475.904l-.175.71a.75.75 0 0 1-.904.475l-3.965-1.034a1.75 1.75 0 0 0-1.002-.27c-.447-.116-.764-.55-.764-1.018V12c0-.468.317-.902.764-1.018Z" />
+                    </svg>`;
+                } else {
+                    bgMusic.muted = true;
+                    unmuteBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8">
+                        <path d="M13.5 4.062c0-1.074-1.107-1.746-2.008-1.128L5.58 6.204a1.25 1.25 0 0 0-.858 1.127v10.538c0 .89.923 1.464 1.794.997l7.585-4.22c.87-.484.87-1.285 0-1.768l-7.585-4.22a1.25 1.25 0 0 0-1.794.997l-.271 2.221-.303-.545A2.25 2.25 0 0 1 4.5 12.25a2.25 2.25 0 0 1 1.708-2.18l.19-.056.27-.486 4.757-2.65ZM14.192 4.674l5.421 9.609c.642 1.139-.245 2.545-1.503 2.545-.306 0-.598-.103-.84-.28l-3.237-2.39L14.192 4.674ZM20.73 7.843c1.258 0 2.146 1.406 1.503 2.545l-5.421 9.609c-.242.43-.534.633-.84.633-1.258 0-2.146-1.406-1.503-2.545l5.421-9.609Z" clip-rule="evenodd" />
+                    </svg>`;
+                }
+                isMuted = !isMuted;
+            });
+
+            // Intersection Observer for scroll animations
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    } else {
+                        entry.target.classList.remove('visible');
+                    }
+                });
+            }, {
+                threshold: 0.2
+            });
+
+            document.querySelectorAll('.animated-entry').forEach(section => {
+                observer.observe(section);
+            });
+
+            // Parallax effect on sections
+            window.addEventListener('scroll', () => {
+                document.querySelectorAll('.parallax-bg').forEach(el => {
+                    const speed = el.dataset.speed || -0.2;
+                    const yPos = window.pageYOffset * speed;
+                    el.style.transform = `translate3d(0, ${yPos}px, 0)`;
+                });
+            });
+
+            // Back to Top Button
+            const backToTopBtn = document.getElementById('back-to-top');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 300) {
+                    backToTopBtn.style.display = 'block';
+                } else {
+                    backToTopBtn.style.display = 'none';
+                }
+            });
+
+            backToTopBtn.addEventListener('click', () => {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+
+            // Countdown Timer
+            const weddingDate = new Date('November 15, 2025 18:00:00').getTime();
+            const countdownElements = {
+                days: document.getElementById('days'),
+                hours: document.getElementById('hours'),
+                minutes: document.getElementById('minutes'),
+                seconds: document.getElementById('seconds')
+            };
+
+            function updateCountdown() {
+                const now = new Date().getTime();
+                const distance = weddingDate - now;
+
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                const values = {
+                    days,
+                    hours,
+                    minutes,
+                    seconds
+                };
+
+                for (const key in values) {
+                    const el = countdownElements[key];
+                    const newValue = String(values[key]).padStart(2, '0');
+                    if (el.textContent !== newValue) {
+                        el.classList.add('out');
+                        setTimeout(() => {
+                            el.textContent = newValue;
+                            el.classList.remove('out');
+                            el.classList.add('in');
+                            setTimeout(() => el.classList.remove('in'), 500);
+                        }, 250);
+                    }
+                }
+
+                if (distance < 0) {
+                    clearInterval(countdownInterval);
+                    document.getElementById('countdown-timer').innerHTML = `<p class="text-2xl font-bold text-[#A0522D]">We Are Married!</p>`;
+                }
+            }
+
+            const countdownInterval = setInterval(updateCountdown, 1000);
+            updateCountdown();
+
+            // Carousel Logic
+            const slidesData = [
+                { title: "Priya & Sangeet", subtitle: "The Beginning of Forever", imageUrl: "./bg1.png" },
+                { title: "A Story of Love", subtitle: "Join Us in Our Celebration", imageUrl: "./bg2.png" },
+                { title: "The Families Unite", subtitle: "Blessings and Joy", imageUrl: "./bg3.png" }
+            ];
+
+            let currentSlide = 0;
+            const carouselContainer = document.getElementById('carousel');
+            const heroTitle = document.getElementById('hero-title');
+            const heroSubtitle = document.getElementById('hero-subtitle');
+
+            function createCarouselSlides() {
+                slidesData.forEach((slide, index) => {
+                    const slideEl = document.createElement('div');
+                    slideEl.classList.add('carousel-slide', 'absolute', 'inset-0', 'transition-opacity', 'duration-1000', 'opacity-0');
+                    if (index === 0) {
+                        slideEl.classList.add('opacity-100');
+                    }
+                    slideEl.style.backgroundImage = `url('${slide.imageUrl}')`;
+                    carouselContainer.appendChild(slideEl);
+                });
+            }
+
+            function updateCarouselText(index) {
+                heroTitle.textContent = slidesData[index].title;
+                heroSubtitle.textContent = slidesData[index].subtitle;
+            }
+
+            function showNextSlide() {
+                const slides = carouselContainer.children;
+                slides[currentSlide].classList.remove('opacity-100');
+                currentSlide = (currentSlide + 1) % slides.length;
+                slides[currentSlide].classList.add('opacity-100');
+                updateCarouselText(currentSlide);
+            }
+
+            createCarouselSlides();
+            updateCarouselText(0);
+            setInterval(showNextSlide, 5000);
+
+            // Wedding Schedule Data
+            const scheduleData = [{
+                title: "Haldi & Mehndi Ceremony",
+                time: "Friday, Nov 14, 2025 | 10:00 AM",
+                venue: "Hotel Grand, Terrace Garden"
+            }, {
+                title: "Sangeet & Cocktail Night",
+                time: "Friday, Nov 14, 2025 | 07:00 PM",
+                venue: "Hotel Grand, Grand Ballroom"
+            }, {
+                title: "The Wedding Ceremony",
+                time: "Saturday, Nov 15, 2025 | 06:00 PM",
+                venue: "Hotel Grand, Banquet Hall"
+            }, {
+                title: "Reception",
+                time: "Saturday, Nov 15, 2025 | 08:00 PM",
+                venue: "Hotel Grand, Lawns"
+            }];
+
+            const scheduleTimeline = document.getElementById('schedule-timeline');
+            scheduleData.forEach((event, index) => {
+                const item = document.createElement('div');
+                item.classList.add('border-l-4', 'border-[#A0522D]', 'pl-6', 'py-4', 'relative');
+                item.innerHTML = `
+                    <div class="absolute w-4 h-4 rounded-full bg-[#A0522D] -left-2 top-6"></div>
+                    <div class="space-y-2">
+                        <h3 class="text-xl md:text-2xl font-bold text-[#A0522D]">${event.title}</h3>
+                        <p class="text-md md:text-lg font-medium text-[#4B372F]">${event.time}</p>
+                        <p class="text-sm md:text-md text-gray-600">${event.venue}</p>
+                    </div>
+                `;
+                scheduleTimeline.appendChild(item);
+            });
+
+            // RSVP Form Submission
+            const rsvpForm = document.getElementById('rsvp-form');
+            rsvpForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const message = document.getElementById('rsvp-message');
+                message.textContent = 'Submitting...';
+
+                const name = document.getElementById('name').value;
+                const contact = document.getElementById('contact').value;
+
+                if (!db || !userId) {
+                    message.textContent = 'Error: Firebase not initialized. Please try again later.';
+                    console.error("Firebase or UserID not available.");
+                    return;
+                }
+
+                try {
+                    const rsvpRef = collection(db, `/artifacts/${appId}/public/data/rsvps`);
+                    await addDoc(rsvpRef, {
+                        name: name,
+                        contact: contact,
+                        timestamp: new Date()
+                    });
+                    message.textContent = 'Thank you for your RSVP! We look forward to seeing you!';
+                    rsvpForm.reset();
+                } catch (error) {
+                    message.textContent = 'Submission failed. Please try again.';
+                    console.error("Error submitting RSVP:", error);
+                }
+            });
+
+            // Three.js Parallax Background
+            const threeContainer = document.getElementById('three-container');
+            let scene, camera, renderer, particles, geometry, materials = [], parameters;
+            let mouseX = 0, mouseY = 0;
+            let windowHalfX = window.innerWidth / 2;
+            let windowHalfY = window.innerHeight / 2;
+
+            function initThree() {
+                scene = new THREE.Scene();
+                camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                camera.position.z = 200;
+
+                renderer = new THREE.WebGLRenderer({
+                    alpha: true
+                });
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                threeContainer.appendChild(renderer.domElement);
+
+                const colors = [0xFFD700, 0xA0522D, 0xFFFAF0, 0xE0B0FF];
+                geometry = new THREE.BufferGeometry();
+                const vertices = [];
+                for (let i = 0; i < 500; i++) {
+                    const x = Math.random() * 2000 - 1000;
+                    const y = Math.random() * 2000 - 1000;
+                    const z = Math.random() * 2000 - 1000;
+                    vertices.push(x, y, z);
+                }
+                geometry.setAttribute('position', new THREE.Float32Array(vertices), 3);
+
+                for (let i = 0; i < colors.length; i++) {
+                    const color = colors[i];
+                    materials[i] = new THREE.PointsMaterial({
+                        color: color,
+                        size: 4
+                    });
+                    particles = new THREE.Points(geometry, materials[i]);
+                    scene.add(particles);
+                }
+
+                window.addEventListener('resize', onWindowResize, false);
+                document.addEventListener('mousemove', onDocumentMouseMove, false);
+            }
+
+            function onWindowResize() {
+                windowHalfX = window.innerWidth / 2;
+                windowHalfY = window.innerHeight / 2;
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+
+            function onDocumentMouseMove(event) {
+                mouseX = (event.clientX - windowHalfX) * 0.1;
+                mouseY = (event.clientY - windowHalfY) * 0.1;
+            }
+
+            function animate() {
+                requestAnimationFrame(animate);
+                camera.position.x += (mouseX - camera.position.x) * 0.05;
+                camera.position.y += (-mouseY - camera.position.y) * 0.05;
+                camera.lookAt(scene.position);
+                renderer.render(scene, camera);
+            }
+            
+            window.onload = function() {
+              initThree();
+              animate();
+            };
+        });
+    </script>
+</body>
+</html>

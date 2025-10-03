@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wedding Invitation Website</title>
+    <style>
+        #template-list {
+
+            li{
+                padding: 5px ;
+                font-size: 17px;
+            }
+        }
+
+
+        button{
+            padding: 5px;
+            background: white;
+            outline: none;
+            border: 1px solid green;
+            border-radius: 8px;
+            cursor: pointer;
+
+            &:hover{
+                background: green;
+                color: white;
+            }
+        }
+    </style>
+</head>
+<body>
+        <ol id="template-list">
+            <li><a href="https://jsk0099.github.io/wedding-invite/indian_wedding_website%20(1).html" target="_blank">Template 1</a></li>
+            <li><a href="https://jsk0099.github.io/wedding-invite/indian_wedding_website%20(2).html" target="_blank">Template 2</a></li>
+            <li><a href="https://jsk0099.github.io/wedding-invite/geminiai2.html" target="_blank">Template 3</a></li>
+            <li><a href="https://jsk0099.github.io/wedding-invite/geminiai.html" target="_blank">Template 4</a></li>
+            <li><a href="https://jsk0099.github.io/wedding-invite/wed_copy.html" target="_blank">Template 5</a></li>
+            <li><a href="https://jsk0099.github.io/wedding-invite/indian_wedding_website.html" target="_blank">Template 6</a></li>
+            <li><a href="https://jsk0099.github.io/wedding-invite/index%202.html" target="_blank">Template 7</a></li>
+        </ol>
+
+        <button onclick="openAllTemplates()">Open All Templates</button>
+
+        <script>
+            const templateUrls = [
+                "https://jsk0099.github.io/wedding-invite/indian_wedding_website%20(1).html",
+                "https://jsk0099.github.io/wedding-invite/indian_wedding_website%20(2).html",
+                "https://jsk0099.github.io/wedding-invite/geminiai2.html",
+                "https://jsk0099.github.io/wedding-invite/geminiai.html",
+                "https://jsk0099.github.io/wedding-invite/wed_copy.html",
+                "https://jsk0099.github.io/wedding-invite/indian_wedding_website.html",
+                "https://jsk0099.github.io/wedding-invite/index%202.html"
+            ];
+
+            function openAllTemplates() {
+                templateUrls.forEach(url => window.open(url, '_blank'));
+            }
+        </script>
+
+</body>
+</html>
